@@ -2,11 +2,7 @@ import { type Handle, redirect } from "@sveltejs/kit";
 import { getSessionUser, parseSessionId } from "$lib/server/auth";
 import { getSessionCookieName } from "$lib/server/session";
 
-const PUBLIC_PATHS = [
-	"/login",
-	"/auth/usos/callback",
-	"/api/sync-programmes",
-];
+const PUBLIC_PATHS = ["/login", "/auth/usos/callback", "/api/sync-programmes"];
 
 function isPublicPath(pathname: string): boolean {
 	return PUBLIC_PATHS.some(

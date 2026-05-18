@@ -66,7 +66,11 @@ export async function* scrapeCatalogBundles(
 		const areaHtml = await fetchHtmlOrNull(areaUrl);
 		await delay(FETCH_DELAY_MS);
 		if (!areaHtml) {
-			recordScrapeError(scrapeErrors, area.code, `failed to load area ${areaUrl}`);
+			recordScrapeError(
+				scrapeErrors,
+				area.code,
+				`failed to load area ${areaUrl}`,
+			);
 			continue;
 		}
 
@@ -124,7 +128,9 @@ export async function* scrapeCatalogBundles(
 				yield bundle.data;
 			} catch (error) {
 				const message =
-					error instanceof Error ? error.message : "Unknown programme scrape error";
+					error instanceof Error
+						? error.message
+						: "Unknown programme scrape error";
 				recordScrapeError(scrapeErrors, niest.programmeCode, message);
 			}
 		}

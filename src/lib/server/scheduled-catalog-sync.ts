@@ -5,9 +5,6 @@ export async function runScheduledCatalogSync(): Promise<void> {
 	console.log("[catalog-sync]", JSON.stringify(summary));
 
 	if (summary.errors.length > 0) {
-		console.error(
-			"[catalog-sync] errors:",
-			summary.errors.join("; "),
-		);
+		console.error("[catalog-sync] errors:", summary.errors.join("; "));
 	}
 }

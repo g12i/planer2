@@ -10,9 +10,11 @@
 	type Props = {
 		user: { displayName: string };
 		children: Snippet;
+		sidebar: Snippet;
+		title: string;
 	};
 
-	let { user, children }: Props = $props();
+	let { user, children, sidebar, title }: Props = $props();
 
 	let sidebarOpen = $state(true);
 	let logoutForm = $state<HTMLFormElement | null>(null);
@@ -39,11 +41,11 @@
 
 			<Separator orientation="vertical" decorative />
 
-			<SidebarPanel />
+			<SidebarPanel {sidebar} />
 
 			<Separator orientation="vertical" decorative />
 
-			<MainColumn {sidebarOpen}>
+			<MainColumn {sidebarOpen} {title}>
 				{@render children()}
 			</MainColumn>
 		</div>

@@ -5,15 +5,9 @@
 		"clientKind": "git",
 		"useIgnoreFile": true
 	},
-	"html": {
-		"experimentalFullSupportEnabled": true,
-		"formatter": {
-			"indentScriptAndStyle": true
-		}
-	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["**", "!src/lib/server/database-types.ts"]
+		"includes": ["**", "!src/lib/server/database-types.ts", "!**/*.svelte"]
 	},
 	"formatter": {
 		"enabled": true,

@@ -8,10 +8,11 @@
 
 	type Props = {
 		sidebarOpen: boolean;
+		title: string;
 		children: Snippet;
 	};
 
-	let { sidebarOpen, children }: Props = $props();
+	let { sidebarOpen, title, children }: Props = $props();
 </script>
 
 <div class="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -24,15 +25,13 @@
 					variant="ghost"
 					size="icon"
 					{...props}
-					aria-label={sidebarOpen
-						? 'Zwiń panel boczny'
-						: 'Rozwiń panel boczny'}
+					aria-label={sidebarOpen ? 'Zwiń panel boczny' : 'Rozwiń panel boczny'}
 				>
 					<SidebarIcon class="size-5" weight="regular" />
 				</Button>
 			{/snippet}
 		</Collapsible.Trigger>
-		<h1 class="truncate text-sm font-semibold text-foreground">Plany</h1>
+		<h1 class="truncate text-sm font-semibold text-foreground">{title}</h1>
 	</header>
 
 	<ScrollArea variant="muted">
