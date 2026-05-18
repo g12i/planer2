@@ -1,11 +1,9 @@
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import type { z } from "zod";
-import { v7 as uuidv7 } from "uuid";
 import { AccessDeniedError, assertUserAccess } from "$lib/server/access-guard";
 import {
 	authUserSchema,
 	oauthPendingRecordSchema,
-	redisUserIdSchema,
 	sessionRecordSchema,
 	usosStoredTokensSchema,
 } from "$lib/server/auth-schemas";
@@ -16,12 +14,14 @@ import type {
 } from "$lib/server/auth-types";
 import { decryptToJson, encryptJson } from "$lib/server/crypto";
 import { getRedis } from "$lib/server/redis";
+import { deleteUser, resolveUser } from "$lib/server/users";
 import {
 	fetchUsosAccessToken,
 	fetchUsosCurrentUser,
 } from "$lib/server/usos-oauth";
 import type { UsosOAuthTokens } from "$lib/server/usos-types";
 
+export { createUserId } from "$lib/server/users";
 export type { AuthUser };
 export { AccessDeniedError };
 
@@ -44,11 +44,6 @@ export function parseSessionId(value: string | undefined): string | null {
 		return null;
 	}
 	return trimmed;
-}
-
-/** Time-ordered app user pk (Postgres-friendly). */
-export function createUserId(): string {
-	return uuidv7();
 }
 
 function safeEqualString(a: string, b: string): boolean {
@@ -81,14 +76,15 @@ export async function deleteOAuthPending(oauthToken: string): Promise<void> {
 	await redis.del(`oauth:pending:${oauthToken}`);
 }
 
-export async function createSession(userId: string): Promise<string> {
+export async function createSession(user: AuthUser): Promise<string> {
 	const redis = getRedis();
 	const sessionId = createSessionId();
-	await redis.set(
-		`session:${sessionId}`,
-		sessionRecordSchema.parse({ userId }),
-		{ ex: SESSION_TTL_SEC },
-	);
+	const record = sessionRecordSchema.parse({
+		userId: user.id,
+		usosUserId: user.usosUserId,
+		displayName: user.displayName,
+	});
+	await redis.set(`session:${sessionId}`, record, { ex: SESSION_TTL_SEC });
 	return sessionId;
 }
 
@@ -114,59 +110,6 @@ export async function deleteSession(sessionId: string): Promise<void> {
 
 	const redis = getRedis();
 	await redis.del(`session:${id}`);
-}
-
-export async function getUser(userId: string): Promise<AuthUser | null> {
-	const redis = getRedis();
-	const raw = await redis.get(`user:${userId}`);
-	return readRedis(authUserSchema, raw, "user");
-}
-
-export async function saveUser(user: AuthUser): Promise<void> {
-	const parsed = authUserSchema.parse(user);
-	const redis = getRedis();
-	await redis.set(`user:${parsed.id}`, parsed);
-}
-
-async function linkUsosUser(
-	usosUserId: string,
-	userId: string,
-): Promise<boolean> {
-	const redis = getRedis();
-	const result = await redis.set(`user:by-usos:${usosUserId}`, userId, {
-		nx: true,
-	});
-	return result === "OK";
-}
-
-export async function findUserIdByUsosId(
-	usosUserId: string,
-): Promise<string | null> {
-	const redis = getRedis();
-	const raw = await redis.get(`user:by-usos:${usosUserId}`);
-	return readRedis(redisUserIdSchema, raw, "user:by-usos");
-}
-
-async function resolveUserId(usosUserId: string): Promise<{
-	userId: string;
-	isNewUser: boolean;
-}> {
-	const existing = await findUserIdByUsosId(usosUserId);
-	if (existing) {
-		return { userId: existing, isNewUser: false };
-	}
-
-	const candidateId = createUserId();
-	if (await linkUsosUser(usosUserId, candidateId)) {
-		return { userId: candidateId, isNewUser: true };
-	}
-
-	const winner = await findUserIdByUsosId(usosUserId);
-	if (!winner) {
-		throw new Error("Failed to resolve user after USOS login.");
-	}
-
-	return { userId: winner, isNewUser: false };
 }
 
 export async function saveUsosTokens(
@@ -195,21 +138,34 @@ export async function getUsosTokens(
 export async function getSessionUser(
 	sessionId: string,
 ): Promise<AuthUser | null> {
-	const userId = await getSessionUserId(sessionId);
-	if (!userId) return null;
-	return getUser(userId);
+	const id = parseSessionId(sessionId);
+	if (!id) {
+		return null;
+	}
+
+	const redis = getRedis();
+	const raw = await redis.get(`session:${id}`);
+	const record = readRedis(sessionRecordSchema, raw, "session");
+	if (!record) {
+		return null;
+	}
+
+	return authUserSchema.parse({
+		id: record.userId,
+		usosUserId: record.usosUserId,
+		displayName: record.displayName,
+	});
 }
 
 async function rollbackLoginArtifacts(params: {
 	userId: string;
-	usosUserId: string;
 	isNewUser: boolean;
 }): Promise<void> {
 	const redis = getRedis();
 	await redis.del(`usos:tokens:${params.userId}`);
+
 	if (params.isNewUser) {
-		await redis.del(`user:${params.userId}`);
-		await redis.del(`user:by-usos:${params.usosUserId}`);
+		await deleteUser(params.userId);
 	}
 }
 
@@ -221,11 +177,13 @@ export async function completeUsosOAuth(params: {
 	const oauthToken = params.oauthToken.trim();
 	const oauthVerifier = params.oauthVerifier.trim();
 	const oauthState = params.oauthState.trim();
+
 	if (!oauthToken || !oauthVerifier || !oauthState) {
 		throw new Error("Missing OAuth token, verifier, or state.");
 	}
 
 	const pending = await getOAuthPending(oauthToken);
+
 	if (!pending) {
 		throw new Error(
 			"OAuth session expired or invalid. Please try logging in again.",
@@ -243,6 +201,7 @@ export async function completeUsosOAuth(params: {
 	);
 
 	const profile = await fetchUsosCurrentUser(tokens);
+
 	assertUserAccess(profile);
 
 	const storedTokens = usosStoredTokensSchema.parse({
@@ -250,26 +209,26 @@ export async function completeUsosOAuth(params: {
 		expiresAt: null,
 	});
 
-	const { userId, isNewUser } = await resolveUserId(profile.id);
+	const displayName =
+		[profile.firstName, profile.lastName].filter(Boolean).join(" ") ||
+		profile.id;
+
+	const { user: dbUser, isNewUser } = await resolveUser(profile.id);
 
 	const user = authUserSchema.parse({
-		id: userId,
-		usosUserId: profile.id,
-		displayName:
-			[profile.firstName, profile.lastName].filter(Boolean).join(" ") ||
-			profile.id,
+		id: dbUser.id,
+		usosUserId: dbUser.usosUserId,
+		displayName,
 	});
 
 	try {
-		await saveUser(user);
-		await saveUsosTokens(userId, storedTokens);
+		await saveUsosTokens(user.id, storedTokens);
 		await deleteOAuthPending(oauthToken);
-		const sessionId = await createSession(userId);
+		const sessionId = await createSession(user);
 		return { user, sessionId };
 	} catch (error) {
 		await rollbackLoginArtifacts({
-			userId,
-			usosUserId: profile.id,
+			userId: user.id,
 			isNewUser,
 		});
 		throw error;

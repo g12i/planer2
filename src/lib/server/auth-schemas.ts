@@ -15,11 +15,11 @@ export const usosStoredTokensSchema = usosOAuthTokensSchema.extend({
 
 export const sessionRecordSchema = z.object({
 	userId: userIdSchema,
+	usosUserId: z.string().min(1),
+	displayName: z.string(),
 });
 
 export const oauthPendingRecordSchema = z.object({
 	requestTokenSecret: z.string().min(1),
 	state: z.string().min(16),
 });
-
-export const redisUserIdSchema = userIdSchema;

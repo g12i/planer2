@@ -12,7 +12,8 @@
 		}
 	},
 	"files": {
-		"ignoreUnknown": false
+		"ignoreUnknown": false,
+		"includes": ["**", "!src/lib/server/database-types.ts"]
 	},
 	"formatter": {
 		"enabled": true,
