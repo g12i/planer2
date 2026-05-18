@@ -1,23 +1,17 @@
 <script lang="ts">
-	import type { PageProps } from "./$types";
+	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 </script>
 
-<main class="mx-auto max-w-lg p-6">
-	<h1 class="text-xl font-semibold">Planer</h1>
-
-	{#if data.user}
-		<p class="mt-2 text-neutral-600">
-			Zalogowano jako <strong>{data.user.displayName}</strong>
+{#if data.user}
+	<div class="max-w-2xl">
+		<h2 class="text-2xl font-semibold tracking-tight text-foreground">
+			Plany zajęć
+		</h2>
+		<p class="mt-3 text-sm leading-relaxed text-foreground-alt">
+			Tutaj pojawią się Twoje plany zajęć. Wybierz plan z panelu bocznego lub
+			utwórz nowy, aby rozpocząć planowanie semestru.
 		</p>
-		<form method="POST" action="/logout" class="mt-6">
-			<button
-				type="submit"
-				class="rounded-lg border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-50"
-			>
-				Wyloguj
-			</button>
-		</form>
-	{/if}
-</main>
+	</div>
+{/if}
