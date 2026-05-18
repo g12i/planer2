@@ -23,12 +23,6 @@ export const USOS_DEFAULT_SCOPES = "offline_access|studies" as const;
 export const USOS_USER2_FIELDS =
 	"id|first_name|last_name|student_number|staff_status" as const;
 
-export type {
-	UsosOAuthTokens,
-	UsosRequestToken,
-	UsosUserProfile,
-} from "$lib/server/usos-types";
-
 function getUsosBaseUrl(): string {
 	return env.USOS_BASE_URL?.replace(/\/$/, "") ?? USOS_GEO_ORIGIN;
 }

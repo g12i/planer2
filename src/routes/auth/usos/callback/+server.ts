@@ -1,5 +1,6 @@
 import { isRedirect, redirect } from "@sveltejs/kit";
-import { AccessDeniedError, completeUsosOAuth } from "$lib/server/auth";
+import { AccessDeniedError } from "$lib/server/access-guard";
+import { completeUsosOAuth } from "$lib/server/auth";
 import {
 	getOAuthStateCookieDeleteOptions,
 	getOAuthStateCookieName,

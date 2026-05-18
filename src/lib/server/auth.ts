@@ -1,6 +1,6 @@
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import type { z } from "zod";
-import { AccessDeniedError, assertUserAccess } from "$lib/server/access-guard";
+import { assertUserAccess } from "$lib/server/access-guard";
 import {
 	authUserSchema,
 	oauthPendingRecordSchema,
@@ -20,10 +20,6 @@ import {
 	fetchUsosCurrentUser,
 } from "$lib/server/usos-oauth";
 import type { UsosOAuthTokens } from "$lib/server/usos-types";
-
-export { createUserId } from "$lib/server/users";
-export type { AuthUser };
-export { AccessDeniedError };
 
 const SESSION_TTL_SEC = 60 * 60 * 24 * 7;
 const OAUTH_PENDING_TTL_SEC = 60 * 30;
