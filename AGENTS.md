@@ -41,6 +41,21 @@ Examples: [`auth-schemas.ts`](src/lib/server/auth-schemas.ts) + [`auth-types.ts`
 - No type re-exports from schemas file; no hand-written duplicate interfaces.
 - Writes + decrypted blobs: `schema.parse(…)`; Redis reads: `safeParse` → warn + `null` if corrupt/missing; USOS HTTP `parseJsonBody`.
 
+### Imports (no barrel re-exports)
+
+Import from the module that **defines** the symbol. Do not re-export types, classes, or helpers from unrelated files (e.g. `auth.ts` must not `export { createUserId } from "./users"`).
+
+| Need | Import from |
+|------|-------------|
+| `AuthUser`, session/OAuth types | [`auth-types.ts`](src/lib/server/auth-types.ts) |
+| `createUserId`, `resolveUser` | [`users.ts`](src/lib/server/users.ts) |
+| `AccessDeniedError`, `assertUserAccess` | [`access-guard.ts`](src/lib/server/access-guard.ts) |
+| `UsosOAuthTokens`, `UsosUserProfile`, … | [`usos-types.ts`](src/lib/server/usos-types.ts) |
+| `CatalogSyncSummary`, scraped types | [`catalog-types.ts`](src/lib/server/catalog-types.ts) |
+| `syncCatalog`, scrape helpers | [`catalog-sync.ts`](src/lib/server/catalog-sync.ts), [`catalog-scraper.ts`](src/lib/server/catalog-scraper.ts) |
+| Sessions, OAuth flow | [`auth.ts`](src/lib/server/auth.ts) — only what that file exports |
+| USOS HTTP helpers | [`usos-oauth.ts`](src/lib/server/usos-oauth.ts) — functions/constants only |
+
 ## Boolean coercion
 
 Need `boolean` from value → `Boolean(x)`. Not `!!x`.
@@ -64,6 +79,7 @@ Planner data lives in Supabase (project `planer2`). **Server-only** — no `@sup
 - **Types**: [`database-types.ts`](src/lib/server/database-types.ts) — generated (`pnpm gen:db-types`), biome-ignored. Do not hand-edit. Table row types come from here, not Zod.
 - **JSONB only**: [`planner-schemas.ts`](src/lib/server/planner-schemas.ts) + [`planner-types.ts`](src/lib/server/planner-types.ts) — Zod for `subject.activities`, `semester_day_layout.slots`; use `parseSubjectActivities` / `parseDaySlots` at boundaries.
 - **Migrations**: [`supabase/migrations/`](supabase/migrations/) — source of truth for schema; apply via Supabase MCP or CLI.
+- **Primary keys**: always **UUID v7** for new row `id` values (time-ordered). Generate in app code with `v7()` from [`uuid`](https://www.npmjs.com/package/uuid) — see [`users.ts`](src/lib/server/users.ts). Do not rely on `gen_random_uuid()` (v4) for inserts. New migrations: prefer `id uuid PRIMARY KEY` without a v4 default; supply v7 on insert.
 
 ### Auth vs Postgres
 
