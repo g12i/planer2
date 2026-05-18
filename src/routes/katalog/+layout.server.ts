@@ -5,7 +5,7 @@ export const load: LayoutServerLoad = async () => {
   const { data, error } = await getSupabase()
     .from("catalog_programme")
     .select("id, code, name, semester_count")
-    .order("code");
+    .order("name");
 
   if (error) {
     throw new Error(`Failed to load programmes: ${error.message}`);
