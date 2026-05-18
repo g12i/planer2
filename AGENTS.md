@@ -81,6 +81,36 @@ Planner data lives in Supabase (project `planer2`). **Server-only** — no `@sup
 - **Migrations**: [`supabase/migrations/`](supabase/migrations/) — source of truth for schema; apply via Supabase MCP or CLI.
 - **Primary keys**: always **UUID v7** for new row `id` values (time-ordered). Generate in app code with `v7()` from [`uuid`](https://www.npmjs.com/package/uuid) — see [`users.ts`](src/lib/server/users.ts). Do not rely on `gen_random_uuid()` (v4) for inserts. New migrations: prefer `id uuid PRIMARY KEY` without a v4 default; supply v7 on insert.
 
+### Database structure
+
+Two **decoupled** domains in `public` — no FKs between `catalog_*` and `plan_*`. User plans copy snapshot fields from catalog when created; afterwards they diverge.
+
+**Reference catalog** (Informator scrape → [`catalog-sync.ts`](src/lib/server/catalog-sync.ts)):
+
+| Table | Purpose | Notable columns |
+|-------|---------|-----------------|
+| `catalog_programme` | Niestacjonarne programme variant | `code` (unique, e.g. `W1-N1KO19.2025`), `name` (area + label), `semester_count` |
+| `catalog_subject` | Modules per semester | `catalog_programme_id`, `semester_number`, `module_code`, `module_name`, `catalog_id`, `activities` (JSONB) |
+
+Unique: `catalog_subject (catalog_programme_id, module_code, semester_number)` where `module_code` is set.
+
+**User plans** (app mutations after session + `plan_ownership` check):
+
+| Table | Purpose |
+|-------|---------|
+| `users` | Identity FK target (`id`, `usos_user_id`) |
+| `plan` | Plan header; snapshot `programme_code`, `programme_name`, `level` (no catalog FK) |
+| `plan_ownership` | `plan_id` + `user_id` + `role` |
+| `plan_semester` | `plan_id`, `number`, optional dates |
+| `plan_semester_subject` | Module snapshot: `module_code`, `module_name`, `ects` |
+| `plan_semester_subject_group` | `activity_kind`, `hours_total`, `group_index`, optional `lecturer_usos_id` |
+| `plan_semester_day_layout` | `date`, `slots` (JSONB — validate with `parseDaySlots`) |
+| `plan_schedule_entry` | Concrete slot for a group (`start_date_time`, `end_date_time`, optional `room_usos_id`) |
+
+**Other**: `lecturer_availability` keyed by `usos_id` (referenced from `plan_semester_subject_group`).
+
+**JSONB validation**: `catalog_subject.activities` → [`planner-schemas.ts`](src/lib/server/planner-schemas.ts) (`parseSubjectActivities`); `plan_semester_day_layout.slots` → `parseDaySlots`.
+
 ### Auth vs Postgres
 
 USOS OAuth stays in Redis (sessions, encrypted tokens, OAuth pending). Postgres `users` is identity for FKs only: `id` + `usos_user_id` ([`users.ts`](src/lib/server/users.ts)).
