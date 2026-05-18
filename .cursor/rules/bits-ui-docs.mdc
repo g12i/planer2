@@ -1,0 +1,27 @@
+---
+description: Before implementing Bits UI, load llms.txt docs for props, child snippet, floating wrappers
+globs: "**/*.svelte"
+alwaysApply: false
+---
+
+# Bits UI — docs before code
+
+**Before** wiring Bits UI (props, `{#snippet child}`, `bind:ref`, floats, dates/locale): pull **LLM-oriented** docs so markup/API matches current Bits UI.
+
+## Fetch order
+
+1. **Component page** (replace `<slug>` with docs path segment, e.g. `dialog`, `popover`):  
+   `https://www.bits-ui.com/docs/components/<slug>/llms.txt`
+2. **Cross-cutting** (when snippet/ref/portal/theme applies):  
+   - Child / DOM delegation: `https://www.bits-ui.com/docs/child-snippet/llms.txt`  
+   - Refs: `https://www.bits-ui.com/docs/ref/llms.txt`  
+   - Styling: `https://www.bits-ui.com/docs/styling/llms.txt`  
+   - Floating content rules live under **Child Snippet** (wrapper `{...wrapperProps}` unstyled, inner `{...props}` styled).
+3. **Bulk / discovery**: `https://www.bits-ui.com/docs/llms.txt` or index `https://www.bits-ui.com/llms.txt`.
+
+Use **WebFetch** (or equivalent) on these URLs; do **not** guess portal structure or `child` signatures.
+
+## After fetch
+
+- Match **Bits UI** + **Svelte 5** runes (`$props`, snippets).
+- For floating surfaces (`Popover.Content`, `Select.Content`, `Tooltip.Content`, etc.), enforce **two-level** `child` pattern from docs unless component API says otherwise.

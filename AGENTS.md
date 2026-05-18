@@ -55,6 +55,14 @@ const hasToken = !!sessionId;
 
 ---
 
+## UI primitives (Bits UI)
+
+Role-model wrapper: [`src/lib/components/ui/button.svelte`](src/lib/components/ui/button.svelte). Match it when adding new Bits-backed components (`cva` + `cn`, `<script module>` exports, `VariantProps`, Snippet children).
+
+Full checklist: [`src/lib/components/ui/README.md`](src/lib/components/ui/README.md).
+
+---
+
 Svelte MCP server: Svelte 5 + SvelteKit docs. Tool usage:
 
 ## Available Svelte MCP Tools:

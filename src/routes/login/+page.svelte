@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import Button from '$lib/components/ui/button.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -19,7 +20,9 @@
 </script>
 
 <div class="flex min-h-svh flex-col items-center justify-center gap-6 p-6">
-	<div class="flex w-full max-w-sm flex-col gap-6">
+	<div
+		class="flex w-full max-w-sm -translate-y-[clamp(0.75rem,4svh,2.75rem)] flex-col gap-6"
+	>
 		<div class="flex flex-col items-center gap-2 text-center">
 			<h1 class="text-xl font-semibold">Planer</h1>
 			<p class="text-sm text-neutral-600">
@@ -32,12 +35,7 @@
 		{/if}
 
 		<form method="POST" use:enhance>
-			<button
-				type="submit"
-				class="w-full rounded-lg bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-neutral-800"
-			>
-				Zaloguj przez USOS
-			</button>
+			<Button type="submit" class="w-full">Zaloguj przez USOS</Button>
 		</form>
 	</div>
 </div>
