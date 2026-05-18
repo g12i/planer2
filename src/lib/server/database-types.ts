@@ -15,6 +15,71 @@ export type Database = {
   }
   public: {
     Tables: {
+      catalog_programme: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          name: string
+          semester_count: number | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          name: string
+          semester_count?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          name?: string
+          semester_count?: number | null
+        }
+        Relationships: []
+      }
+      catalog_subject: {
+        Row: {
+          activities: Json
+          catalog_id: string | null
+          catalog_programme_id: string
+          created_at: string
+          id: string
+          module_code: string | null
+          module_name: string
+          semester_number: number
+        }
+        Insert: {
+          activities?: Json
+          catalog_id?: string | null
+          catalog_programme_id: string
+          created_at?: string
+          id?: string
+          module_code?: string | null
+          module_name: string
+          semester_number: number
+        }
+        Update: {
+          activities?: Json
+          catalog_id?: string | null
+          catalog_programme_id?: string
+          created_at?: string
+          id?: string
+          module_code?: string | null
+          module_name?: string
+          semester_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalog_subject_catalog_programme_id_fkey"
+            columns: ["catalog_programme_id"]
+            isOneToOne: false
+            referencedRelation: "catalog_programme"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lecturer_availability: {
         Row: {
           created_at: string
@@ -58,30 +123,28 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          level: string | null
           name: string | null
-          programme_version_id: string
+          programme_code: string | null
+          programme_name: string | null
         }
         Insert: {
           created_at?: string
           id?: string
+          level?: string | null
           name?: string | null
-          programme_version_id: string
+          programme_code?: string | null
+          programme_name?: string | null
         }
         Update: {
           created_at?: string
           id?: string
+          level?: string | null
           name?: string | null
-          programme_version_id?: string
+          programme_code?: string | null
+          programme_name?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "plan_programme_version_id_fkey"
-            columns: ["programme_version_id"]
-            isOneToOne: false
-            referencedRelation: "programme_version"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       plan_ownership: {
         Row: {
@@ -119,95 +182,42 @@ export type Database = {
           },
         ]
       }
-      programme: {
-        Row: {
-          code: string
-          created_at: string
-          id: string
-          name: string
-        }
-        Insert: {
-          code: string
-          created_at?: string
-          id?: string
-          name: string
-        }
-        Update: {
-          code?: string
-          created_at?: string
-          id?: string
-          name?: string
-        }
-        Relationships: []
-      }
-      programme_version: {
-        Row: {
-          code: string
-          created_at: string
-          id: string
-          label: string | null
-          programme_id: string
-        }
-        Insert: {
-          code: string
-          created_at?: string
-          id?: string
-          label?: string | null
-          programme_id: string
-        }
-        Update: {
-          code?: string
-          created_at?: string
-          id?: string
-          label?: string | null
-          programme_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "programme_version_programme_id_fkey"
-            columns: ["programme_id"]
-            isOneToOne: false
-            referencedRelation: "programme"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      schedule_entry: {
+      plan_schedule_entry: {
         Row: {
           created_at: string
           end_date_time: string
           id: string
+          plan_semester_subject_group_id: string
           room_usos_id: string | null
-          semester_subject_group_id: string
           start_date_time: string
         }
         Insert: {
           created_at?: string
           end_date_time: string
           id?: string
+          plan_semester_subject_group_id: string
           room_usos_id?: string | null
-          semester_subject_group_id: string
           start_date_time: string
         }
         Update: {
           created_at?: string
           end_date_time?: string
           id?: string
+          plan_semester_subject_group_id?: string
           room_usos_id?: string | null
-          semester_subject_group_id?: string
           start_date_time?: string
         }
         Relationships: [
           {
-            foreignKeyName: "schedule_entry_semester_subject_group_id_fkey"
-            columns: ["semester_subject_group_id"]
+            foreignKeyName: "plan_schedule_entry_plan_semester_subject_group_id_fkey"
+            columns: ["plan_semester_subject_group_id"]
             isOneToOne: false
-            referencedRelation: "semester_subject_group"
+            referencedRelation: "plan_semester_subject_group"
             referencedColumns: ["id"]
           },
         ]
       }
-      semester: {
+      plan_semester: {
         Row: {
           created_at: string
           end_date: string | null
@@ -234,7 +244,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "semester_plan_id_fkey"
+            foreignKeyName: "plan_semester_plan_id_fkey"
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "plan"
@@ -242,72 +252,71 @@ export type Database = {
           },
         ]
       }
-      semester_day_layout: {
+      plan_semester_day_layout: {
         Row: {
           date: string
           id: string
-          semester_id: string
+          plan_semester_id: string
           slots: Json
         }
         Insert: {
           date: string
           id?: string
-          semester_id: string
+          plan_semester_id: string
           slots?: Json
         }
         Update: {
           date?: string
           id?: string
-          semester_id?: string
+          plan_semester_id?: string
           slots?: Json
         }
         Relationships: [
           {
-            foreignKeyName: "semester_day_layout_semester_id_fkey"
-            columns: ["semester_id"]
+            foreignKeyName: "plan_semester_day_layout_plan_semester_id_fkey"
+            columns: ["plan_semester_id"]
             isOneToOne: false
-            referencedRelation: "semester"
+            referencedRelation: "plan_semester"
             referencedColumns: ["id"]
           },
         ]
       }
-      semester_subject: {
+      plan_semester_subject: {
         Row: {
           created_at: string
+          ects: number | null
           id: string
-          semester_id: string
-          subject_id: string
+          module_code: string | null
+          module_name: string
+          plan_semester_id: string
         }
         Insert: {
           created_at?: string
+          ects?: number | null
           id?: string
-          semester_id: string
-          subject_id: string
+          module_code?: string | null
+          module_name: string
+          plan_semester_id: string
         }
         Update: {
           created_at?: string
+          ects?: number | null
           id?: string
-          semester_id?: string
-          subject_id?: string
+          module_code?: string | null
+          module_name?: string
+          plan_semester_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "semester_subject_semester_id_fkey"
-            columns: ["semester_id"]
+            foreignKeyName: "plan_semester_subject_plan_semester_id_fkey"
+            columns: ["plan_semester_id"]
             isOneToOne: false
-            referencedRelation: "semester"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "semester_subject_subject_id_fkey"
-            columns: ["subject_id"]
-            isOneToOne: false
-            referencedRelation: "subject"
+            referencedRelation: "plan_semester"
             referencedColumns: ["id"]
           },
         ]
       }
-      semester_subject_group: {
+      plan_semester_subject_group: {
         Row: {
           activity_kind: string
           created_at: string
@@ -316,7 +325,7 @@ export type Database = {
           id: string
           label: string | null
           lecturer_usos_id: string | null
-          semester_subject_id: string
+          plan_semester_subject_id: string
         }
         Insert: {
           activity_kind: string
@@ -326,7 +335,7 @@ export type Database = {
           id?: string
           label?: string | null
           lecturer_usos_id?: string | null
-          semester_subject_id: string
+          plan_semester_subject_id: string
         }
         Update: {
           activity_kind?: string
@@ -336,65 +345,21 @@ export type Database = {
           id?: string
           label?: string | null
           lecturer_usos_id?: string | null
-          semester_subject_id?: string
+          plan_semester_subject_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "semester_subject_group_lecturer_usos_id_fkey"
+            foreignKeyName: "plan_semester_subject_group_lecturer_usos_id_fkey"
             columns: ["lecturer_usos_id"]
             isOneToOne: false
             referencedRelation: "lecturer_availability"
             referencedColumns: ["usos_id"]
           },
           {
-            foreignKeyName: "semester_subject_group_semester_subject_id_fkey"
-            columns: ["semester_subject_id"]
+            foreignKeyName: "plan_semester_subject_group_plan_semester_subject_id_fkey"
+            columns: ["plan_semester_subject_id"]
             isOneToOne: false
-            referencedRelation: "semester_subject"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      subject: {
-        Row: {
-          activities: Json
-          catalog_id: string | null
-          created_at: string
-          ects: number | null
-          id: string
-          module_code: string | null
-          module_name: string
-          programme_version_id: string
-          semester_number: number
-        }
-        Insert: {
-          activities?: Json
-          catalog_id?: string | null
-          created_at?: string
-          ects?: number | null
-          id?: string
-          module_code?: string | null
-          module_name: string
-          programme_version_id: string
-          semester_number: number
-        }
-        Update: {
-          activities?: Json
-          catalog_id?: string | null
-          created_at?: string
-          ects?: number | null
-          id?: string
-          module_code?: string | null
-          module_name?: string
-          programme_version_id?: string
-          semester_number?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "subject_programme_version_id_fkey"
-            columns: ["programme_version_id"]
-            isOneToOne: false
-            referencedRelation: "programme_version"
+            referencedRelation: "plan_semester_subject"
             referencedColumns: ["id"]
           },
         ]
