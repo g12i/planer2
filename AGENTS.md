@@ -55,6 +55,25 @@ const hasToken = !!sessionId;
 
 ---
 
+## Supabase
+
+Planner data lives in Supabase (project `planer2`). **Server-only** — no `@supabase/ssr`, no `PUBLIC_*` Supabase env vars, no browser client.
+
+- **Client**: [`supabase.ts`](src/lib/server/supabase.ts) — `getSupabase()` with `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` from `$env/static/private`.
+- **Security**: RLS enabled on all `public` tables, **zero policies**; `REVOKE` from `anon` / `authenticated`. Only `service_role` (your server) can read/write. App-layer checks via session + `plan_ownership` before mutations.
+- **Types**: [`database-types.ts`](src/lib/server/database-types.ts) — generated (`pnpm gen:db-types`), biome-ignored. Do not hand-edit. Table row types come from here, not Zod.
+- **JSONB only**: [`planner-schemas.ts`](src/lib/server/planner-schemas.ts) + [`planner-types.ts`](src/lib/server/planner-types.ts) — Zod for `subject.activities`, `semester_day_layout.slots`; use `parseSubjectActivities` / `parseDaySlots` at boundaries.
+- **Migrations**: [`supabase/migrations/`](supabase/migrations/) — source of truth for schema; apply via Supabase MCP or CLI.
+
+### Auth vs Postgres
+
+USOS OAuth stays in Redis (sessions, encrypted tokens, OAuth pending). Postgres `users` is identity for FKs only: `id` + `usos_user_id` ([`users.ts`](src/lib/server/users.ts)).
+
+- **`displayName`**: from USOS at login, stored in **Redis session** (`sessionRecordSchema`), not in `users`.
+- Do not re-add Redis `user:{id}` or `user:by-usos:*` blobs.
+
+---
+
 ## UI primitives (Bits UI)
 
 Role-model wrapper: [`src/lib/components/ui/button.svelte`](src/lib/components/ui/button.svelte). Match it when adding new Bits-backed components (`cva` + `cn`, `<script module>` exports, `VariantProps`, Snippet children).
