@@ -1,26 +1,49 @@
 ## Project Configuration
 
 - **Language**: TypeScript
-- **Package Manager**: yarn
+- **Package Manager**: pnpm
 - **Add-ons**: tailwindcss, mcp
 - **Runtime validation**: Zod (parse at boundaries — see below)
+
+## Communication (caveman)
+
+Default agent replies: **caveman full** — terse, no filler; technical substance exact.
+
+- Off: user says `stop caveman` or `normal mode`.
+- Code, commits, PR bodies: normal prose (not caveman).
+- Commit messages: caveman-commit skill when asked.
 
 ---
 
 ## Parse, don't cast
 
-External data (API responses, `JSON.parse`, webhooks) is **unknown** until validated. Do not use `as SomeType` on it.
+External data (API responses, `JSON.parse`, webhooks, Redis) **unknown** until validated. No `as SomeType`.
 
-- Use **[Zod](https://zod.dev)** — default validator for this project (ecosystem, `safeParse`, inferred types).
-- Define schemas in [`$lib/server/`](src/lib/server/) next to the integration (e.g. [`usos-schemas.ts`](src/lib/server/usos-schemas.ts)).
-- Use `schema.safeParse(value)` (or shared helpers like `parseJsonBody`) and handle failures explicitly.
-- Infer types with `z.infer<typeof schema>` when the schema is the source of truth.
+- **[Zod](https://zod.dev)** — default validator (`safeParse`, inferred types).
+- Schemas in [`$lib/server/`](src/lib/server/) per integration (e.g. [`usos-schemas.ts`](src/lib/server/usos-schemas.ts) + [`usos-types.ts`](src/lib/server/usos-types.ts)).
+- `schema.safeParse(value)` or integration helpers like `parseJsonBody`; handle failures explicitly.
 
-References: [Parse, don't cast](https://typescript.odone.me/parse-dont-cast/), [Zod vs alternatives (2026)](https://www.pkgpulse.com/guides/zod-v4-vs-arktype-vs-typebox-vs-valibot-2026).
+Refs: [Parse, don't cast](https://typescript.odone.me/parse-dont-cast/), [Zod vs alternatives (2026)](https://www.pkgpulse.com/guides/zod-v4-vs-arktype-vs-typebox-vs-valibot-2026).
+
+### Schemas + types file split
+
+Per integration, split Zod + TS types:
+
+| File | Contents |
+|------|----------|
+| `*-schemas.ts` | `z.object(…)` schemas, `.parse` / `safeParse` helpers — **no exported types** |
+| `*-types.ts` | `export type Foo = z.infer<typeof fooSchema>` — import schemas only, define types here |
+
+Examples: [`auth-schemas.ts`](src/lib/server/auth-schemas.ts) + [`auth-types.ts`](src/lib/server/auth-types.ts); [`usos-schemas.ts`](src/lib/server/usos-schemas.ts) + [`usos-types.ts`](src/lib/server/usos-types.ts).
+
+- `*-types.ts`: `import type { fooSchema }` — schemas only in type positions (`typeof` in `z.infer`).
+- Impl imports schemas from `*-schemas`, types from `*-types`.
+- No type re-exports from schemas file; no hand-written duplicate interfaces.
+- Writes: `schema.parse(…)`; auth Redis/crypto reads [`auth-parse.ts`](src/lib/server/auth-parse.ts); USOS HTTP `parseJsonBody`.
 
 ## Boolean coercion
 
-When you need a `boolean` from a value, use `Boolean(x)`. Do not use `!!x`.
+Need `boolean` from value → `Boolean(x)`. Not `!!x`.
 
 ```ts
 // good
@@ -32,26 +55,26 @@ const hasToken = !!sessionId;
 
 ---
 
-You are able to use the Svelte MCP server, where you have access to comprehensive Svelte 5 and SvelteKit documentation. Here's how to use the available tools effectively:
+Svelte MCP server: Svelte 5 + SvelteKit docs. Tool usage:
 
 ## Available Svelte MCP Tools:
 
 ### 1. list-sections
 
-Use this FIRST to discover all available documentation sections. Returns a structured list with titles, use_cases, and paths.
-When asked about Svelte or SvelteKit topics, ALWAYS use this tool at the start of the chat to find relevant sections.
+FIRST — discover doc sections. Returns titles, use_cases, paths.
+Svelte/SvelteKit questions → use at chat start.
 
 ### 2. get-documentation
 
-Retrieves full documentation content for specific sections. Accepts single or multiple sections.
-After calling the list-sections tool, you MUST analyze the returned documentation sections (especially the use_cases field) and then use the get-documentation tool to fetch ALL documentation sections that are relevant for the user's task.
+Full doc content for section(s). Single or multiple.
+After list-sections: check use_cases, fetch ALL relevant sections.
 
 ### 3. svelte-autofixer
 
-Analyzes Svelte code and returns issues and suggestions.
-You MUST use this tool whenever writing Svelte code before sending it to the user. Keep calling it until no issues or suggestions are returned.
+Svelte code issues + suggestions.
+MUST run before sending Svelte code to user. Repeat until clean.
 
 ### 4. playground-link
 
-Generates a Svelte Playground link with the provided code.
-After completing the code, ask the user if they want a playground link. Only call this tool after user confirmation and NEVER if code was written to files in their project.
+Svelte Playground link from code.
+After code done: ask user first. NEVER if code written to project files.
