@@ -1,0 +1,15 @@
+# Deploy / cron testing — entry wraps SvelteKit worker + scheduled sync.
+# Requires build first (generated worker at .svelte-kit/cloudflare/_worker.js).
+# Always: pnpm deploy:cf  (not bare wrangler deploy)
+
+name = "planer2"
+main = "src/cloudflare-entry.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[triggers]
+crons = ["0 3 * * 0"]
+
+[assets]
+directory = ".svelte-kit/cloudflare"
+binding = "ASSETS"
