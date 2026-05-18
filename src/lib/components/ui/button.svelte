@@ -2,25 +2,23 @@
 	import { cva } from 'class-variance-authority';
 
 	export const buttonVariants = cva(
-		'inline-flex shrink-0 items-center justify-center gap-2 rounded-none px-4 py-2.5 text-sm font-medium disabled:pointer-events-none disabled:opacity-50',
+		'inline-flex shrink-0 items-center justify-center rounded-md border border-transparent text-sm font-medium whitespace-nowrap transition-all outline-hidden select-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4',
 		{
 			variants: {
 				variant: {
 					primary:
-						'transition-[filter] bg-accent text-accent-foreground hover:brightness-110 active:brightness-95',
-					secondary:
-						'transition-colors bg-muted text-foreground hover:bg-muted/80 active:bg-muted/70',
-					outline:
-						'border border-border-input bg-transparent transition-colors hover:bg-muted/40 active:bg-muted/55',
-					ghost: 'transition-colors hover:bg-muted/50 active:bg-muted/65',
-					destructive:
-						'transition-[filter] bg-destructive text-white hover:brightness-110 active:brightness-95',
-					link:
-						'px-1 py-0.5 text-accent underline underline-offset-4 hover:brightness-110 transition-[filter]',
+						'bg-accent text-accent-foreground hover:brightness-110 active:brightness-95',
+					ghost:
+						'text-foreground-alt hover:bg-muted hover:text-foreground active:bg-muted/70',
+				},
+				size: {
+					default: 'h-9 gap-1.5 px-3',
+					icon: 'size-10 shrink-0 gap-0 p-0',
 				},
 			},
 			defaultVariants: {
 				variant: 'primary',
+				size: 'default',
 			},
 		},
 	);
@@ -42,12 +40,15 @@
 
 	let {
 		variant,
+		size,
 		class: className,
 		children,
 		...rest
 	}: Props = $props();
 
-	const mergedClass = $derived(cn(buttonVariants({ variant }), className));
+	const mergedClass = $derived(
+		cn(buttonVariants({ variant, size }), className),
+	);
 </script>
 
 <Button.Root class={mergedClass} {...rest}>
