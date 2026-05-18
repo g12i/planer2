@@ -1,6 +1,11 @@
 {
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"svelte.enable-ts-plugin": true,
 	"files.associations": {
 		"*.css": "tailwindcss"
+	},
+	"[svelte]": {
+		"editor.defaultFormatter": "svelte.svelte-vscode"
 	},
 	"[javascript]": {
 		"editor.defaultFormatter": "biomejs.biome"
