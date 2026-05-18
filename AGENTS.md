@@ -39,7 +39,7 @@ Examples: [`auth-schemas.ts`](src/lib/server/auth-schemas.ts) + [`auth-types.ts`
 - `*-types.ts`: `import type { fooSchema }` — schemas only in type positions (`typeof` in `z.infer`).
 - Impl imports schemas from `*-schemas`, types from `*-types`.
 - No type re-exports from schemas file; no hand-written duplicate interfaces.
-- Writes: `schema.parse(…)`; auth Redis/crypto reads [`auth-parse.ts`](src/lib/server/auth-parse.ts); USOS HTTP `parseJsonBody`.
+- Writes + decrypted blobs: `schema.parse(…)`; Redis reads: `safeParse` → warn + `null` if corrupt/missing; USOS HTTP `parseJsonBody`.
 
 ## Boolean coercion
 
