@@ -28,7 +28,13 @@
       <div
         class="overflow-hidden rounded-lg border border-border-card shadow-card"
       >
-        <table class="w-full text-sm">
+        <table class="w-full table-fixed text-sm">
+          <colgroup>
+            <col class="w-[45%]" />
+            <col class="w-[25%]" />
+            <col class="w-[18%]" />
+            <col class="w-[12%]" />
+          </colgroup>
           <thead>
             <tr class="border-b border-border-card bg-muted/50">
               <th class="px-4 py-2 text-left font-medium text-foreground-alt">
