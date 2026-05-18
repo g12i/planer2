@@ -1,9 +1,9 @@
 import type { z } from "zod";
 import type {
-	authUserSchema,
-	oauthPendingRecordSchema,
-	sessionRecordSchema,
-	usosStoredTokensSchema,
+  authUserSchema,
+  oauthPendingRecordSchema,
+  sessionRecordSchema,
+  usosStoredTokensSchema,
 } from "$lib/server/auth-schemas";
 
 export type AuthUser = z.infer<typeof authUserSchema>;

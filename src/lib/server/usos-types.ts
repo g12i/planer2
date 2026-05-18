@@ -1,11 +1,11 @@
 import type { z } from "zod";
 import type {
-	oauthTokenParamsSchema,
-	usosOAuthTokensSchema,
-	usosRequestTokenSchema,
-	usosSignedHttpMethodSchema,
-	usosUserProfileSchema,
-	usosUserResponseSchema,
+  oauthTokenParamsSchema,
+  usosOAuthTokensSchema,
+  usosRequestTokenSchema,
+  usosSignedHttpMethodSchema,
+  usosUserProfileSchema,
+  usosUserResponseSchema,
 } from "$lib/server/usos-schemas";
 
 export type UsosUserResponse = z.infer<typeof usosUserResponseSchema>;

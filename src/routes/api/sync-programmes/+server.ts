@@ -4,22 +4,22 @@ import { syncCatalog } from "$lib/server/catalog-sync";
 import type { RequestHandler } from "./$types";
 
 function isAuthorized(request: Request): boolean {
-	const syncSecret = env.SYNC_SECRET;
-	if (!syncSecret) {
-		return false;
-	}
-	const header = request.headers.get("authorization");
-	return header === `Bearer ${syncSecret}`;
+  const syncSecret = env.SYNC_SECRET;
+  if (!syncSecret) {
+    return false;
+  }
+  const header = request.headers.get("authorization");
+  return header === `Bearer ${syncSecret}`;
 }
 
 export const POST: RequestHandler = async ({ request }) => {
-	if (!isAuthorized(request)) {
-		return json({ error: "Unauthorized" }, { status: 401 });
-	}
+  if (!isAuthorized(request)) {
+    return json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-	syncCatalog().catch((error) => {
-		console.error("[sync-programmes] catalog sync failed", error);
-	});
+  syncCatalog().catch((error) => {
+    console.error("[sync-programmes] catalog sync failed", error);
+  });
 
-	return json({ message: "Catalog sync started" });
+  return json({ message: "Catalog sync started" });
 };

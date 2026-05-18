@@ -1,9 +1,9 @@
 import type { z } from "zod";
 import type {
-	daySlotSchema,
-	daySlotsSchema,
-	subjectActivitiesSchema,
-	subjectActivitySchema,
+  daySlotSchema,
+  daySlotsSchema,
+  subjectActivitiesSchema,
+  subjectActivitySchema,
 } from "$lib/server/planner-schemas";
 
 export type SubjectActivity = z.infer<typeof subjectActivitySchema>;

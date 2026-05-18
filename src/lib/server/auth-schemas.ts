@@ -4,22 +4,22 @@ import { usosOAuthTokensSchema } from "$lib/server/usos-schemas";
 export const userIdSchema = z.uuid();
 
 export const authUserSchema = z.object({
-	id: userIdSchema,
-	usosUserId: z.string().min(1),
-	displayName: z.string(),
+  id: userIdSchema,
+  usosUserId: z.string().min(1),
+  displayName: z.string(),
 });
 
 export const usosStoredTokensSchema = usosOAuthTokensSchema.extend({
-	expiresAt: z.string().nullable(),
+  expiresAt: z.string().nullable(),
 });
 
 export const sessionRecordSchema = z.object({
-	userId: userIdSchema,
-	usosUserId: z.string().min(1),
-	displayName: z.string(),
+  userId: userIdSchema,
+  usosUserId: z.string().min(1),
+  displayName: z.string(),
 });
 
 export const oauthPendingRecordSchema = z.object({
-	requestTokenSecret: z.string().min(1),
-	state: z.string().min(16),
+  requestTokenSecret: z.string().min(1),
+  state: z.string().min(16),
 });
