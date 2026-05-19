@@ -133,6 +133,7 @@
   --animate-enter-from-right: enter-from-right 0.2s ease;
   --animate-exit-to-left: exit-to-left 0.2s ease;
   --animate-exit-to-right: exit-to-right 0.2s ease;
+  --animate-skeleton-slide: skeleton-slide 1600ms ease-out 1ms infinite forwards;
 
   --font-sans: "Inter", "sans-serif";
   --font-mono: "Source Code Pro", "monospace";
@@ -250,6 +251,18 @@
     }
     to {
       opacity: 0;
+    }
+  }
+
+  @keyframes skeleton-slide {
+    0% {
+      transform: translateX(-100%);
+    }
+    50% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(100%);
     }
   }
 }
