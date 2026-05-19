@@ -1,0 +1,14 @@
+---
+description: No motion.div or animation library wrappers unless project uses them
+globs: **/*.svelte
+alwaysApply: false
+---
+
+# No motion wrappers
+
+This project does NOT use svelte-motion, Framer Motion, or `motion.div` / `motion.section` etc.
+
+- Use plain HTML elements (`div`, `section`, `main`, etc.)
+- For animation: use Svelte built-in transitions (`transition:`, `in:`, `out:`, `animate:`) or CSS
+- NEVER add `motion.*` wrapper elements
+- NEVER install svelte-motion or similar libs without explicit user request
