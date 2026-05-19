@@ -15,7 +15,7 @@
   };
 
   type Props = WithoutChildrenOrChild<RadioGroup.RootProps> & {
-    items: RadioGroupOption[];
+    items: readonly RadioGroupOption[];
     value?: string;
     class?: string;
   };

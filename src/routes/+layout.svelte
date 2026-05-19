@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { dev } from '$app/environment';
 	import { QueryClientProvider } from '@tanstack/svelte-query';
+	import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
 	import { onMount } from 'svelte';
 
 	import './layout.css';
@@ -20,4 +22,7 @@
 	<TooltipProvider>
 		{@render children()}
 	</TooltipProvider>
+	{#if dev}
+		<SvelteQueryDevtools />
+	{/if}
 </QueryClientProvider>

@@ -17,7 +17,12 @@
 	const ICON_RAIL_LINKS = [
 		{ icon: SquaresFourIcon, label: 'Plany', href: '/', match: '/' },
 		{ icon: BookIcon, label: 'Katalog', href: '/katalog', match: '/katalog' },
-		{ icon: UserSwitchIcon, label: 'Dostępność prowadzących' },
+		{
+			icon: UserSwitchIcon,
+			label: 'Dostępność prowadzących',
+			href: '/dostepnosc-prowadzacych',
+			match: '/dostepnosc-prowadzacych',
+		},
 	] as const;
 
 	type Props = {
