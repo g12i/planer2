@@ -1,29 +1,16 @@
-<script lang="ts" module>
-	import { cva } from 'class-variance-authority';
-
-	export const dropdownMenuLabelVariants = cva(
-		'px-2 py-1.5 text-xs font-medium text-foreground-alt',
-	);
-</script>
-
 <script lang="ts">
 	import { DropdownMenu } from 'bits-ui';
 	import type { Snippet } from 'svelte';
 
-	import { cn } from '$lib/utils/cn';
-
 	type Props = {
-		class?: string;
 		children: Snippet;
 	};
 
-	let { class: className, children }: Props = $props();
-
-	const mergedClass = $derived(cn(dropdownMenuLabelVariants(), className));
+	let { children }: Props = $props();
 </script>
 
 <DropdownMenu.Group>
-	<DropdownMenu.GroupHeading class={mergedClass}>
+	<DropdownMenu.GroupHeading class="px-2 py-1.5 text-xs font-medium text-foreground-alt">
 		{@render children()}
 	</DropdownMenu.GroupHeading>
 </DropdownMenu.Group>

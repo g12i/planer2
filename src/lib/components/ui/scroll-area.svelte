@@ -15,14 +15,6 @@
 			},
 		},
 	);
-
-	export const scrollAreaScrollbarVariants = cva(
-		'bg-muted hover:bg-dark-10 data-[state=visible]:animate-in data-[state=hidden]:animate-out data-[state=hidden]:fade-out-0 data-[state=visible]:fade-in-0 flex w-2 touch-none select-none rounded-full border-l border-l-transparent p-px transition-all duration-200 hover:w-2.5',
-	);
-
-	export const scrollAreaThumbVariants = cva(
-		'bg-muted-foreground flex-1 rounded-full',
-	);
 </script>
 
 <script lang="ts">
@@ -30,36 +22,30 @@
 	import type { VariantProps } from 'class-variance-authority';
 	import type { Snippet } from 'svelte';
 
-	import { cn } from '$lib/utils/cn';
-
 	type Props = WithoutChild<ScrollArea.RootProps> &
 		VariantProps<typeof scrollAreaRootVariants> & {
-			class?: string;
 			children: Snippet;
 		};
 
 	let {
 		variant,
-		class: className,
 		children,
 		type = 'hover',
 		...rest
 	}: Props = $props();
 
-	const mergedRootClass = $derived(
-		cn(scrollAreaRootVariants({ variant }), className),
-	);
+	const rootClass = scrollAreaRootVariants({ variant });
 </script>
 
-<ScrollArea.Root {type} class={mergedRootClass} {...rest}>
+<ScrollArea.Root {type} class={rootClass} {...rest}>
 	<ScrollArea.Viewport class="h-full w-full">
 		{@render children()}
 	</ScrollArea.Viewport>
 	<ScrollArea.Scrollbar
 		orientation="vertical"
-		class={scrollAreaScrollbarVariants()}
+		class="bg-muted hover:bg-dark-10 data-[state=visible]:animate-in data-[state=hidden]:animate-out data-[state=hidden]:fade-out-0 data-[state=visible]:fade-in-0 flex w-2 touch-none select-none rounded-full border-l border-l-transparent p-px transition-all duration-200 hover:w-2.5"
 	>
-		<ScrollArea.Thumb class={scrollAreaThumbVariants()} />
+		<ScrollArea.Thumb class="bg-muted-foreground flex-1 rounded-full" />
 	</ScrollArea.Scrollbar>
 	<ScrollArea.Corner />
 </ScrollArea.Root>

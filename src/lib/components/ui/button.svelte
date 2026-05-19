@@ -10,6 +10,8 @@
             "bg-accent text-accent-foreground hover:brightness-110 active:brightness-95",
           ghost:
             "text-foreground-alt hover:bg-muted hover:text-foreground active:bg-muted/70",
+          destructive:
+            "bg-destructive text-white hover:brightness-110 active:brightness-95 focus-visible:ring-destructive",
         },
         size: {
           default: "h-9 gap-1.5 px-3",
