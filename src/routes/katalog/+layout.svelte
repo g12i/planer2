@@ -1,7 +1,8 @@
 <script lang="ts">
   import { Searcher } from "fast-fuzzy";
-  import { page } from "$app/state";
+  import MagnifyingGlassIcon from "phosphor-svelte/lib/MagnifyingGlassIcon";
 
+  import { page  } from "$app/state";
   import Tooltip from "$lib/components/ui/tooltip.svelte";
   import AppShell from "$lib/components/app-shell/app-shell.svelte";
   import Button from "$lib/components/ui/button.svelte";
@@ -32,8 +33,7 @@
 {#if data.user}
   <AppShell user={data.user} title="Katalog">
     {#snippet sidebar()}
-      <div class="shrink-0 space-y-3 border-border-card border-b px-4 py-4">
-        <h2 class="text-sm font-semibold text-foreground">Katalog programów</h2>
+      <div class="shrink-0 space-y-3 border-border-card border-b px-4 py-2">
         <Input
           type="search"
           placeholder="Szukaj programu..."
@@ -42,7 +42,12 @@
           oninput={(e) => {
             query = e.currentTarget.value;
           }}
-        />
+          size="sm"
+        >
+          {#snippet left()}
+            <MagnifyingGlassIcon class="size-4 text-foreground-alt" />
+          {/snippet}
+        </Input>
       </div>
 
       <ScrollArea>
