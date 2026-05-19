@@ -29,6 +29,7 @@
 <script lang="ts">
   import { Button } from "bits-ui";
   import type { VariantProps } from "class-variance-authority";
+  import CircleNotchIcon from "phosphor-svelte/lib/CircleNotchIcon";
   import type { Snippet } from "svelte";
   import type { SvelteHTMLElements } from "svelte/elements";
 
@@ -39,6 +40,7 @@
       class?: string;
       children: Snippet;
       href?: string;
+      loading?: boolean;
     };
 
   let {
@@ -47,6 +49,8 @@
     class: className,
     children,
     href,
+    loading = false,
+    disabled,
     ...rest
   }: Props = $props();
 
@@ -55,6 +59,14 @@
   );
 </script>
 
-<Button.Root class={mergedClass} {href} {...rest}>
+<Button.Root
+  class={mergedClass}
+  {href}
+  disabled={disabled || loading}
+  {...rest}
+>
+  {#if loading}
+    <CircleNotchIcon class="size-4 animate-spin" />
+  {/if}
   {@render children()}
 </Button.Root>
