@@ -4,7 +4,7 @@
 	import SignOutIcon from 'phosphor-svelte/lib/SignOutIcon';
 	import SquaresFourIcon from 'phosphor-svelte/lib/SquaresFourIcon';
 	import SunIcon from 'phosphor-svelte/lib/SunIcon';
-	import UserCircleIcon from 'phosphor-svelte/lib/UserCircleIcon';
+	import UserSwitchIcon from 'phosphor-svelte/lib/UserSwitchIcon';
 	import UserIcon from 'phosphor-svelte/lib/UserIcon';
 
 	import { page } from '$app/state';
@@ -17,7 +17,7 @@
 	const ICON_RAIL_LINKS = [
 		{ icon: SquaresFourIcon, label: 'Plany', href: '/', match: '/' },
 		{ icon: BookIcon, label: 'Katalog', href: '/katalog', match: '/katalog' },
-		{ icon: UserCircleIcon, label: 'Prowadzący' },
+		{ icon: UserSwitchIcon, label: 'Dostępność prowadzących' },
 	] as const;
 
 	type Props = {
