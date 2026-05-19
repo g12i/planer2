@@ -272,6 +272,8 @@ function allowedAreaGroupIndices(semester: number): Set<number> {
   return new Set([semester - 1, semester].filter((index) => index >= 1));
 }
 
+const RE_ISM_MARKER = /indywidualnych\s+studiów\s+międzyobszarowych/i;
+
 const RE_SECTION_MAJOR = /moduły\s+kierunkowe/i;
 const RE_SECTION_AREA =
   /moduły\s+obszarowe\s+wspierające\s+kształcenie\s+kierunkowe/i;
@@ -380,10 +382,24 @@ function extractParsedModuleRowsForSemester(
   const rows: ParsedModuleRow[] = [];
   const allowedAreaGroups = allowedAreaGroupIndices(semester);
 
+  const preIsmTables: AnyNode[] = [];
+  for (const child of container.children().toArray()) {
+    if (!$(child).is("table") && RE_ISM_MARKER.test($(child).text())) {
+      break;
+    }
+    if ($(child).is("table")) {
+      preIsmTables.push(child);
+    }
+  }
+  const trSource =
+    preIsmTables.length > 0
+      ? $(preIsmTables).find("tr").toArray()
+      : container.find("tr").toArray();
+
   type PlanSection = "neutral" | "major" | "area" | "general";
   let section: PlanSection = "neutral";
 
-  for (const rowElement of container.find("tr").toArray()) {
+  for (const rowElement of trSource) {
     const row = $(rowElement);
     const cells = row.find("> td");
     if (!cells.length) {
