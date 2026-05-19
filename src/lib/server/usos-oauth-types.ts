@@ -6,7 +6,7 @@ import type {
   usosSignedHttpMethodSchema,
   usosUserProfileSchema,
   usosUserResponseSchema,
-} from "$lib/server/usos-schemas";
+} from "$lib/server/usos-oauth-schemas";
 
 export type UsosUserResponse = z.infer<typeof usosUserResponseSchema>;
 export type OAuthTokenParams = z.infer<typeof oauthTokenParamsSchema>;

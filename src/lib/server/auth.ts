@@ -19,7 +19,7 @@ import {
   fetchUsosAccessToken,
   fetchUsosCurrentUser,
 } from "$lib/server/usos-oauth";
-import type { UsosOAuthTokens } from "$lib/server/usos-types";
+import type { UsosOAuthTokens } from "$lib/server/usos-oauth-types";
 
 const SESSION_TTL_SEC = 60 * 60 * 24 * 7;
 const OAUTH_PENDING_TTL_SEC = 60 * 30;

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { usosOAuthTokensSchema } from "$lib/server/usos-schemas";
+import { usosOAuthTokensSchema } from "$lib/server/usos-oauth-schemas";
 
 export const userIdSchema = z.uuid();
 

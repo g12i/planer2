@@ -1,5 +1,5 @@
 import { env } from "$env/dynamic/private";
-import type { UsosUserProfile } from "$lib/server/usos-types";
+import type { UsosUserProfile } from "$lib/server/usos-oauth-types";
 
 export class AccessDeniedError extends Error {
   constructor() {

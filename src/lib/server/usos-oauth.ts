@@ -10,12 +10,12 @@ import {
   usosSignedHttpMethodSchema,
   usosUserResponseSchema,
   usosUserResponseToProfile,
-} from "$lib/server/usos-schemas";
+} from "$lib/server/usos-oauth-schemas";
 import type {
   UsosOAuthTokens,
   UsosRequestToken,
   UsosUserProfile,
-} from "$lib/server/usos-types";
+} from "$lib/server/usos-oauth-types";
 
 export const USOS_GEO_ORIGIN = "https://usosapps.us.edu.pl" as const;
 /** `tt` is a service module, not an OAuth scope — timetable data uses `studies`. */
