@@ -24,7 +24,6 @@
     ondragstart: (event: DragEvent) => void;
     ondragend: () => void;
     onremove: () => void;
-    onschedule?: () => void;
   };
 
   let {
@@ -35,7 +34,6 @@
     ondragstart,
     ondragend,
     onremove,
-    onschedule,
   }: Props = $props();
 
   const color = $derived(
@@ -76,10 +74,7 @@
     </p>
   </div>
   <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div
-    class="shrink-0"
-    onpointerdown={(event) => event.stopPropagation()}
-  >
+  <div class="shrink-0" onpointerdown={(event) => event.stopPropagation()}>
     <DropdownMenu
       contentProps={{ side: "bottom", align: "end", sideOffset: 4 }}
     >
@@ -95,12 +90,6 @@
         </Button>
       {/snippet}
       {#snippet content()}
-        <DropdownMenuItem onSelect={() => onschedule?.()}>
-          {#snippet icon()}
-            <ListIcon />
-          {/snippet}
-          Rozplanuj
-        </DropdownMenuItem>
         <DropdownMenuItem onSelect={onremove}>
           {#snippet icon()}
             <TrashIcon />

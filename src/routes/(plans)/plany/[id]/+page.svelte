@@ -429,7 +429,7 @@
                       <div
                         role="region"
                         aria-label="Przedział {slot.start} – {slot.end}"
-                        class="flex min-h-16 flex-col gap-1 rounded-md border border-dashed p-1 transition-[box-shadow,background-color,border-color] {isTarget &&
+                        class="grid min-h-16 gap-1 rounded-md border border-dashed p-1 transition-[box-shadow,background-color,border-color] {isTarget &&
                         dropConflict
                           ? 'cursor-not-allowed border-destructive/40 bg-destructive/5 ring-2 ring-destructive ring-offset-1 ring-offset-background'
                           : isTarget
@@ -454,6 +454,7 @@
                         ondragleave={(event) => onSlotDragLeave(event, dropKey)}
                         ondrop={(event) =>
                           onSlotDrop(event, semester, dayIso, slot)}
+                        style="grid-template-columns: repeat({cellEntries.length}, minmax(0, 1fr))"
                       >
                         {#each cellEntries as entry (entry.id)}
                           {@const groupContext = findGroupContext(
