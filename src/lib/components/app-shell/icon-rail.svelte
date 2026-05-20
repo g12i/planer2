@@ -13,6 +13,7 @@
 	import DropdownMenuItem from '$lib/components/ui/dropdown-menu-item.svelte';
 	import Tooltip from '$lib/components/ui/tooltip.svelte';
 	import { theme, toggleTheme } from '$lib/theme.svelte';
+  import MenuItem from '../ui/menu-item.svelte';
 
 	const ICON_RAIL_LINKS = [
 		{ icon: SquaresFourIcon, label: 'Plany', href: '/', match: '/' },
@@ -48,16 +49,15 @@
 		{@const active = isActive(link)}
 		<Tooltip label={link.label}>
 			{#snippet trigger(props)}
-				<Button
-					{...props}
-					variant={active ? 'primary' : 'ghost'}
+				<MenuItem
+					active={active}
 					size="icon"
 					href={'href' in link ? link.href : undefined}
 					aria-label={link.label}
 					aria-current={active ? 'page' : undefined}
 				>
 					<link.icon class="size-5" weight="regular" />
-				</Button>
+				</MenuItem>
 			{/snippet}
 		</Tooltip>
 	{/each}

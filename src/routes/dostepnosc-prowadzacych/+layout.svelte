@@ -1,16 +1,16 @@
 <script lang="ts">
+  import { createQuery } from "@tanstack/svelte-query";
   import { Searcher } from "fast-fuzzy";
   import MagnifyingGlassIcon from "phosphor-svelte/lib/MagnifyingGlassIcon";
   import PlusIcon from "phosphor-svelte/lib/PlusIcon";
-  import { createQuery } from "@tanstack/svelte-query";
 
   import { page } from "$app/state";
   import AppShell from "$lib/components/app-shell/app-shell.svelte";
   import Button from "$lib/components/ui/button.svelte";
   import Input from "$lib/components/ui/input.svelte";
+  import MenuItem from "$lib/components/ui/menu-item.svelte";
   import ScrollArea from "$lib/components/ui/scroll-area.svelte";
   import Skeleton from "$lib/components/ui/skeleton.svelte";
-  import Tooltip from "$lib/components/ui/tooltip.svelte";
   import { lecturerAvailabilityQueries } from "$lib/lecturer-availability-queries";
   import type { LecturerAvailabilityListItem } from "$lib/lecturer-availability-types";
   import type { LayoutProps } from "./$types";
@@ -75,22 +75,14 @@
           {:else}
             {#each filtered as lecturer (lecturer.usos_id)}
               <li>
-                <Tooltip label={lecturer.name}>
-                  {#snippet trigger(props)}
-                    <Button
-                      {...props}
-                      href="/dostepnosc-prowadzacych/{encodeURIComponent(
-                        lecturer.usos_id,
-                      )}"
-                      variant={activeUsosId === lecturer.usos_id
-                        ? "primary"
-                        : "ghost"}
-                      class="w-full justify-start text-left font-normal"
-                    >
-                      <span class="truncate">{lecturer.name}</span>
-                    </Button>
-                  {/snippet}
-                </Tooltip>
+                <MenuItem
+                  href="/dostepnosc-prowadzacych/{encodeURIComponent(
+                    lecturer.usos_id,
+                  )}"
+                  active={activeUsosId === lecturer.usos_id}
+                >
+                  {lecturer.name}
+                </MenuItem>
               </li>
             {/each}
             {#if filtered.length === 0}
