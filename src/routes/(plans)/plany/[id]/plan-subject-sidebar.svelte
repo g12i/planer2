@@ -2,8 +2,11 @@
   import { getContext } from "svelte";
   import CheckIcon from "phosphor-svelte/lib/CheckIcon";
   import SlidersHorizontalIcon from "phosphor-svelte/lib/SlidersHorizontalIcon";
+  import SquareIcon from "phosphor-svelte/lib/SquareIcon";
   import type { PlanDetailSubject } from "$lib/plan-types";
 
+  import { activityCardColor, dotColor } from "$lib/activity-card-hue";
+  import { cardColors } from "$lib/card-colors.svelte";
   import Button from "$lib/components/ui/button.svelte";
   import Tooltip from "$lib/components/ui/tooltip.svelte";
   import {
@@ -16,6 +19,7 @@
     PLAN_GROUP_DRAG_TYPE,
     type PlanGroupDragPayload,
   } from "./plan-day-slots";
+  import { dragState } from "./plan-drag-state.svelte";
   import SubjectGroupsDialog from "./subject-groups-dialog.svelte";
 
   type Props = {
@@ -60,10 +64,12 @@
       event.dataTransfer.effectAllowed = "copy";
     }
     draggingGroupId = group.id;
+    dragState.groupId = group.id;
   }
 
   function onGroupDragEnd() {
     draggingGroupId = null;
+    dragState.groupId = null;
   }
 </script>
 
@@ -82,15 +88,26 @@
           group.id,
           scheduleEntries,
         )}
+        {@const color = activityCardColor({
+          subjectName: subject.module_name,
+          activityKind: group.activity_kind,
+          groupIndex: group.group_index,
+        })}
         <li
           draggable={remaining > 0}
-          class="flex items-center gap-3 py-1 pr-3 text-xs text-foreground-alt {remaining >
-          0
+          class="flex items-center gap-2 py-1 pr-3 text-xs {remaining > 0
             ? 'cursor-grab active:cursor-grabbing'
             : ''} {draggingGroupId === group.id ? 'opacity-50' : ''}"
           ondragstart={(event) => onGroupDragStart(event, subject, group)}
           ondragend={onGroupDragEnd}
         >
+          {#if cardColors.enabled}
+            <SquareIcon
+              weight="fill"
+              class="size-2 shrink-0"
+              color={dotColor(color)}
+            />
+          {/if}
           <span class="min-w-0 flex-1 truncate"
             >{formatGroupTitle(group, subject.groups)}</span
           >
@@ -101,7 +118,9 @@
               aria-label="Wszystkie godziny zaplanowane"
             />
           {:else}
-            <span class="shrink-0 tabular-nums">· {remaining}h</span>
+            <span class="shrink-0 text-foreground-alt"
+              >{remaining}/{group.hours_total}</span
+            >
           {/if}
         </li>
       {/each}
@@ -126,7 +145,7 @@
               aria-label="Ustawienia grup zajęć"
               onclick={() => openSettings(subject)}
             >
-              <SlidersHorizontalIcon weight="regular" />
+              <SlidersHorizontalIcon />
             </Button>
           {/snippet}
         </Tooltip>

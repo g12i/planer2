@@ -71,5 +71,7 @@
   {#if loading}
     <CircleNotchIcon class="size-4 animate-spin" />
   {/if}
-  {@render children()}
+  {#if !(loading && (size === "icon" || size === "icon-sm"))}
+    {@render children()}
+  {/if}
 </Button.Root>

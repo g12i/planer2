@@ -8,12 +8,16 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import TooltipProvider from '$lib/components/ui/tooltip-provider.svelte';
 	import { queryClient } from '$lib/query-client';
+	import { initCardColors } from '$lib/card-colors.svelte';
 	import { initTheme } from '$lib/theme.svelte';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
 
-	onMount(initTheme);
+	onMount(() => {
+		initTheme();
+		initCardColors();
+	});
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>

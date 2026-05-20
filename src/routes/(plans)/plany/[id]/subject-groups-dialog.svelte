@@ -229,7 +229,7 @@
                       disabled={countForKind(kind) <= 1 || isPending}
                       onclick={() => removeGroup(group._key, kind)}
                     >
-                      <XIcon class="size-4" weight="regular" />
+                      <XIcon />
                     </Button>
                   {/snippet}
                 </Tooltip>
@@ -244,7 +244,7 @@
             disabled={isPending}
             onclick={() => addGroup(kind)}
           >
-            <PlusIcon class="size-3.5" weight="regular" />
+            <PlusIcon />
             Dodaj grupę
           </Button>
         </section>

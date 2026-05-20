@@ -2,16 +2,14 @@
 	import { DropdownMenu, type WithoutChild } from 'bits-ui';
 	import type { Snippet } from 'svelte';
 
-	import Button from '$lib/components/ui/button.svelte';
 	import DropdownMenuLabel from '$lib/components/ui/dropdown-menu-label.svelte';
 	import DropdownMenuSeparator from '$lib/components/ui/dropdown-menu-separator.svelte';
 
 	type Props = WithoutChild<DropdownMenu.RootProps> & {
-		trigger: Snippet;
+		trigger: Snippet<[Record<string, unknown>]>;
 		content: Snippet;
 		header?: Snippet;
 		footer?: Snippet;
-		triggerAriaLabel?: string;
 		contentProps?: WithoutChild<DropdownMenu.ContentProps>;
 	};
 
@@ -21,7 +19,6 @@
 		content,
 		header,
 		footer,
-		triggerAriaLabel,
 		contentProps,
 		...rootProps
 	}: Props = $props();
@@ -30,14 +27,7 @@
 <DropdownMenu.Root bind:open {...rootProps}>
 	<DropdownMenu.Trigger>
 		{#snippet child({ props })}
-			<Button
-				variant="ghost"
-				size="icon"
-				{...props}
-				aria-label={triggerAriaLabel}
-			>
-				{@render trigger()}
-			</Button>
+			{@render trigger(props)}
 		{/snippet}
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Portal>

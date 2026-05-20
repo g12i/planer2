@@ -116,7 +116,7 @@
           disabled={draftSlots.length <= 1 || isPending}
           onclick={() => removeSlot(index)}
         >
-          <XIcon class="size-4" weight="regular" />
+          <XIcon />
         </Button>
       </div>
     {/each}
@@ -128,7 +128,7 @@
       disabled={isPending}
       onclick={addSlot}
     >
-      <PlusIcon class="size-4" weight="regular" />
+      <PlusIcon />
       Dodaj przedział
     </Button>
 

@@ -20,7 +20,7 @@ function entryRealMinutes(entry: ScheduleEntry): number {
 }
 
 function entryDurationAcademicHours(entry: ScheduleEntry): number {
-	return realMinutesToAcademicHours(entryRealMinutes(entry));
+	return Math.round(realMinutesToAcademicHours(entryRealMinutes(entry)));
 }
 
 export function scheduledHoursForGroup(

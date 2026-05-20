@@ -1,6 +1,5 @@
 <script lang="ts">
 	import BookIcon from 'phosphor-svelte/lib/BookIcon';
-	import CheckIcon from 'phosphor-svelte/lib/CheckIcon';
 	import MoonIcon from 'phosphor-svelte/lib/MoonIcon';
 	import PaletteIcon from 'phosphor-svelte/lib/PaletteIcon';
 	import SignOutIcon from 'phosphor-svelte/lib/SignOutIcon';
@@ -11,6 +10,7 @@
 
 	import { page } from '$app/state';
 	import { cardColors, toggleCardColors } from '$lib/card-colors.svelte';
+	import Button from '$lib/components/ui/button.svelte';
 	import DropdownMenuItem from '$lib/components/ui/dropdown-menu-item.svelte';
 	import DropdownMenu from '$lib/components/ui/dropdown-menu.svelte';
 	import Tooltip from '$lib/components/ui/tooltip.svelte';
@@ -58,7 +58,7 @@
 					aria-label={link.label}
 					aria-current={active ? 'page' : undefined}
 				>
-					<link.icon class="size-5" weight="regular" />
+					<link.icon class="size-5" />
 				</MenuItem>
 			{/snippet}
 		</Tooltip>
@@ -66,11 +66,17 @@
 
 	<div class="mt-auto">
 		<DropdownMenu
-			triggerAriaLabel={`Konto użytkownika: ${user.displayName}`}
 			contentProps={{ side: 'right', align: 'end', sideOffset: 8 }}
 		>
-			{#snippet trigger()}
-				<UserIcon />
+			{#snippet trigger(props)}
+				<Button
+					variant="ghost"
+					size="icon"
+					{...props}
+					aria-label={`Konto użytkownika: ${user.displayName}`}
+				>
+					<UserIcon />
+				</Button>
 			{/snippet}
 			{#snippet header()}
 				<span class="block max-w-40 truncate">
