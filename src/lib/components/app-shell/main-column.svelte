@@ -10,9 +10,10 @@
 		sidebarOpen: boolean;
 		title: string;
 		children: Snippet;
+		toolbar?: Snippet;
 	};
 
-	let { sidebarOpen, title, children }: Props = $props();
+	let { sidebarOpen, title, children, toolbar }: Props = $props();
 </script>
 
 <div class="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -31,6 +32,11 @@
 				</Button>
 			{/snippet}
 		</Collapsible.Trigger>
+		{#if toolbar}
+			<div class="flex min-w-0 flex-1 items-center">
+				{@render toolbar()}
+			</div>
+		{/if}
 		<h1 class="truncate text-sm font-semibold text-foreground">{title}</h1>
 	</header>
 

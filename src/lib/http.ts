@@ -1,5 +1,18 @@
 import type { ZodType, z } from "zod";
 
+function errorMessageFromBody(body: unknown, status: number): string {
+  if (
+    body &&
+    typeof body === "object" &&
+    "error" in body &&
+    typeof body.error === "string"
+  ) {
+    return body.error;
+  }
+
+  return `HTTP error! status: ${status}`;
+}
+
 export async function http<TOut extends ZodType, TPayload>({
   method,
   url,
@@ -45,7 +58,14 @@ export async function http<TOut extends ZodType, TPayload>({
   const response = await fetch(request);
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    let body: unknown;
+    try {
+      body = await response.json();
+    } catch {
+      body = undefined;
+    }
+
+    throw new Error(errorMessageFromBody(body, response.status));
   }
 
   if (schema) {

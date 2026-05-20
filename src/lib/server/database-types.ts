@@ -123,7 +123,6 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          level: string | null
           name: string | null
           programme_code: string | null
           programme_name: string | null
@@ -131,7 +130,6 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          level?: string | null
           name?: string | null
           programme_code?: string | null
           programme_name?: string | null
@@ -139,7 +137,6 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          level?: string | null
           name?: string | null
           programme_code?: string | null
           programme_name?: string | null
@@ -284,7 +281,6 @@ export type Database = {
       plan_semester_subject: {
         Row: {
           created_at: string
-          ects: number | null
           id: string
           module_code: string | null
           module_name: string
@@ -292,7 +288,6 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          ects?: number | null
           id?: string
           module_code?: string | null
           module_name: string
@@ -300,7 +295,6 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          ects?: number | null
           id?: string
           module_code?: string | null
           module_name?: string

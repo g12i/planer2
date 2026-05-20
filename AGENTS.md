@@ -99,10 +99,10 @@ Unique: `catalog_subject (catalog_programme_id, module_code, semester_number)` w
 | Table | Purpose |
 |-------|---------|
 | `users` | Identity FK target (`id`, `usos_user_id`) |
-| `plan` | Plan header; snapshot `programme_code`, `programme_name`, `level` (no catalog FK) |
+| `plan` | Plan header; snapshot `programme_code`, `programme_name` (no catalog FK) |
 | `plan_ownership` | `plan_id` + `user_id` + `role` |
-| `plan_semester` | `plan_id`, `number`, optional dates |
-| `plan_semester_subject` | Module snapshot: `module_code`, `module_name`, `ects` |
+| `plan_semester` | `plan_id`, `number`, `start_date`, `end_date` (`date`, nullable in DB; set on create) |
+| `plan_semester_subject` | Module snapshot: `module_code`, `module_name` |
 | `plan_semester_subject_group` | `activity_kind`, `hours_total`, `group_index`, optional `lecturer_usos_id` |
 | `plan_semester_day_layout` | `date`, `slots` (JSONB — validate with `parseDaySlots`) |
 | `plan_schedule_entry` | Concrete slot for a group (`start_date_time`, `end_date_time`, optional `room_usos_id`) |
@@ -125,6 +125,69 @@ USOS OAuth stays in Redis (sessions, encrypted tokens, OAuth pending). Postgres 
 Role-model wrapper: [`src/lib/components/ui/button.svelte`](src/lib/components/ui/button.svelte). Match it when adding new Bits-backed components (`cva` + `cn`, `<script module>` exports, `VariantProps`, Snippet children).
 
 Full checklist: [`src/lib/components/ui/README.md`](src/lib/components/ui/README.md).
+
+### Dates and calendars
+
+Stack: **[Bits UI](https://www.bits-ui.com/docs/components/date-picker)** date primitives + **[`@internationalized/date`](https://react-spectrum.adobe.com/internationalized/date/)** for calendar math. Docs: [Date Picker](https://www.bits-ui.com/docs/components/date-picker), [Date Range Picker](https://www.bits-ui.com/docs/components/date-range-picker); project rule [`.cursor/rules/bits-ui-docs.mdc`](.cursor/rules/bits-ui-docs.mdc) points at `/llms.txt` before non-trivial wiring.
+
+#### UI wrappers (this repo)
+
+| Component | File | Bits primitive | `bind:value` type | Use when |
+|-----------|------|----------------|-------------------|----------|
+| Single date | [`date-picker.svelte`](src/lib/components/ui/date-picker.svelte) | `DatePicker.*` | `DateValue \| undefined` | One calendar day (plan semester bounds, etc.) |
+| Range | [`date-range-picker.svelte`](src/lib/components/ui/date-range-picker.svelte) | `DateRangePicker.*` | `DateRange \| undefined` (`{ start?, end? }`) | Pick start+end in one control (lecturer unavailable dates) |
+
+Shared defaults on both: `locale="pl-PL"`, `granularity="day"`, `weekdayFormat="short"`, `fixedWeeks={true}`. Optional `label` prop; styling lives **inside** the primitive (bordered input row + popover calendar). Pages only add layout (`flex`, `gap`, `max-w`) — no Tailwind on picker internals.
+
+**Component tree** (single-date; range is the same with `DateRangePicker` and two `Input type="start"|"end"`):
+
+```
+wrapper `div` (layout group — `DatePicker.Root` has no `class` prop)
+└── *.Root bind:value
+    ├── *.Label (optional)
+    ├── div (bordered field: segments + trigger)
+    │   ├── *.Input → segments → *.Segment per part
+    │   └── *.Trigger → calendar icon
+    └── *.Content
+        └── *.Calendar
+            ├── *.Header → PrevButton, Heading, NextButton
+            └── Grid → HeadCell weekdays, Body → Cell → Day
+```
+
+**Bits UI quirk:** `DatePicker.Root` typings omit `class`; put layout classes on a **wrapper `div`**. `DateRangePicker.Root` accepts `class` (merged via `cn`); that wrapper still exposes optional `class?: string` for width at call sites (e.g. lecturer page).
+
+#### Boundary: picker ↔ API ↔ Postgres
+
+| Layer | Format | Notes |
+|-------|--------|--------|
+| Component state | `DateValue` / `DateRange` | From `@internationalized/date` + `bits-ui`; never send raw to API |
+| HTTP / Zod | `yyyy-MM-dd` strings | `isoDateSchema` regex in feature `*-schemas.ts` (see [`plan-schemas.ts`](src/lib/plan-schemas.ts), [`lecturer-availability-schemas.ts`](src/lib/lecturer-availability-schemas.ts)) |
+| Ordering | `parseDate(iso).compare(…)` | Use in `.refine()` for `end >= start`, not string compare |
+| Postgres `plan_semester` | `date` columns `start_date`, `end_date` | ISO date strings on insert; nullable in schema but required on plan create |
+
+Convert picker → API:
+
+```ts
+import { dateValueToIso } from "$lib/date-ranges";
+// dateValueToIso(startDate) → "2026-09-01"
+```
+
+[`date-ranges.ts`](src/lib/date-ranges.ts) also has `groupConsecutiveIsoDates` / `formatIsoDateRange` for lecturer chips. Expanding a `DateRange` to per-day ISO strings: loop `CalendarDate` with `.add({ days: 1 })` (see [`dostepnosc-prowadzacych/[usos_id]/+page.svelte`](src/routes/dostepnosc-prowadzacych/[usos_id]/+page.svelte) `expandDateRange`).
+
+#### Plan create + semester dates
+
+Feature modules: [`plan-schemas.ts`](src/lib/plan-schemas.ts) + [`plan-types.ts`](src/lib/plan-types.ts), [`plan-queries.ts`](src/lib/plan-queries.ts), [`plan-mutations.ts`](src/lib/plan-mutations.ts), [`POST /api/plans`](src/routes/api/plans/+server.ts), form [`(plans)/nowy/+page.svelte`](src/routes/(plans)/nowy/+page.svelte).
+
+- `planCreateSchema`: mandatory `start_date`, `end_date`; shared client + server validation.
+- On create, **same** `start_date` / `end_date` copied onto **every** selected `plan_semester` row (not per-semester ranges yet).
+- Partial insert rollback: delete `plan` row → `ON DELETE CASCADE` cleans children (no Supabase JS transaction; RPC deferred).
+
+#### Adding a new date field
+
+1. Pick `date-picker` vs `date-range-picker`.
+2. `$state<DateValue | undefined>` (or `DateRange`) in page; `dateValueToIso` before `safeParse`.
+3. Add `isoDateSchema` + `.refine` for range order in the feature `*-schemas.ts`.
+4. Persist ISO strings to Postgres `date` / `timestamptz` as appropriate.
 
 ---
 

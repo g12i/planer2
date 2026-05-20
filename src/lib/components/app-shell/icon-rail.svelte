@@ -4,19 +4,18 @@
 	import SignOutIcon from 'phosphor-svelte/lib/SignOutIcon';
 	import SquaresFourIcon from 'phosphor-svelte/lib/SquaresFourIcon';
 	import SunIcon from 'phosphor-svelte/lib/SunIcon';
-	import UserSwitchIcon from 'phosphor-svelte/lib/UserSwitchIcon';
 	import UserIcon from 'phosphor-svelte/lib/UserIcon';
+	import UserSwitchIcon from 'phosphor-svelte/lib/UserSwitchIcon';
 
 	import { page } from '$app/state';
-	import Button from '$lib/components/ui/button.svelte';
-	import DropdownMenu from '$lib/components/ui/dropdown-menu.svelte';
 	import DropdownMenuItem from '$lib/components/ui/dropdown-menu-item.svelte';
+	import DropdownMenu from '$lib/components/ui/dropdown-menu.svelte';
 	import Tooltip from '$lib/components/ui/tooltip.svelte';
 	import { theme, toggleTheme } from '$lib/theme.svelte';
-  import MenuItem from '../ui/menu-item.svelte';
+	import MenuItem from '../ui/menu-item.svelte';
 
 	const ICON_RAIL_LINKS = [
-		{ icon: SquaresFourIcon, label: 'Plany', href: '/', match: '/' },
+		{ icon: SquaresFourIcon, label: 'Plany', href: '/', match: '/plany' },
 		{ icon: BookIcon, label: 'Katalog', href: '/katalog', match: '/katalog' },
 		{
 			icon: UserSwitchIcon,

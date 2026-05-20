@@ -12,9 +12,10 @@
 		children: Snippet;
 		sidebar: Snippet;
 		title: string;
+		toolbar?: Snippet;
 	};
 
-	let { user, children, sidebar, title }: Props = $props();
+	let { user, children, sidebar, title, toolbar }: Props = $props();
 
 	let sidebarOpen = $state(true);
 	let logoutForm = $state<HTMLFormElement | null>(null);
@@ -45,7 +46,7 @@
 
 			<Separator orientation="vertical" decorative />
 
-			<MainColumn {sidebarOpen} {title}>
+			<MainColumn {sidebarOpen} {title} {toolbar}>
 				{@render children()}
 			</MainColumn>
 		</div>
