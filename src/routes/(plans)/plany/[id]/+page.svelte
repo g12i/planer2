@@ -32,9 +32,9 @@
     ScheduleEntry,
   } from "$lib/plan-types";
 
-	import CustomHoursDialog from "./custom-hours-dialog.svelte";
-	import { dragState } from "./plan-drag-state.svelte";
-	import ScheduleEntryCard from "./schedule-entry-card.svelte";
+  import CustomHoursDialog from "./custom-hours-dialog.svelte";
+  import { dragState } from "./plan-drag-state.svelte";
+  import ScheduleEntryCard from "./schedule-entry-card.svelte";
   import {
     acceptsScheduleDrag,
     buildSlotTimestamp,
@@ -66,10 +66,10 @@
     updateScheduleEntryMutationOptions(queryClient, planId),
   );
 
-	let hoursDialogOpen = $state(false);
-	let dropTargetKey = $state<string | null>(null);
-	let dropConflict = $state(false);
-	let draggingEntryId = $state<string | null>(null);
+  let hoursDialogOpen = $state(false);
+  let dropTargetKey = $state<string | null>(null);
+  let dropConflict = $state(false);
+  let draggingEntryId = $state<string | null>(null);
   let hoursDialogDate = $state("");
   let hoursDialogSemesterId = $state("");
   let hoursDialogInitialSlots = $state<DayLayoutSlot[]>([]);
@@ -146,64 +146,64 @@
     );
   }
 
-	function isSlotConflict(
-		semester: PlanDetailSemester,
-		dayIso: string,
-		slot: DayLayoutSlot,
-	): boolean {
-		const gid = dragState.groupId;
-		if (!gid) return false;
-		return semester.schedule_entries.some(
-			(e) =>
-				e.plan_semester_subject_group_id === gid &&
-				entryMatchesSlot(e.start_date_time, dayIso, slot),
-		);
-	}
+  function isSlotConflict(
+    semester: PlanDetailSemester,
+    dayIso: string,
+    slot: DayLayoutSlot,
+  ): boolean {
+    const gid = dragState.groupId;
+    if (!gid) return false;
+    return semester.schedule_entries.some(
+      (e) =>
+        e.plan_semester_subject_group_id === gid &&
+        entryMatchesSlot(e.start_date_time, dayIso, slot),
+    );
+  }
 
-	function applySlotDragOver(
-		event: DragEvent,
-		dropKey: string,
-		semester: PlanDetailSemester,
-		dayIso: string,
-		slot: DayLayoutSlot,
-	) {
-		const transfer = event.dataTransfer;
-		if (!transfer || !acceptsScheduleDrag(transfer.types)) {
-			return;
-		}
-		event.preventDefault();
-		const conflict = isSlotConflict(semester, dayIso, slot);
-		if (conflict) {
-			transfer.dropEffect = "none";
-		} else {
-			const effect = scheduleDragDropEffect(transfer.types);
-			if (effect !== "none") {
-				transfer.dropEffect = effect;
-			}
-		}
-		dropTargetKey = dropKey;
-		dropConflict = conflict;
-	}
+  function applySlotDragOver(
+    event: DragEvent,
+    dropKey: string,
+    semester: PlanDetailSemester,
+    dayIso: string,
+    slot: DayLayoutSlot,
+  ) {
+    const transfer = event.dataTransfer;
+    if (!transfer || !acceptsScheduleDrag(transfer.types)) {
+      return;
+    }
+    event.preventDefault();
+    const conflict = isSlotConflict(semester, dayIso, slot);
+    if (conflict) {
+      transfer.dropEffect = "none";
+    } else {
+      const effect = scheduleDragDropEffect(transfer.types);
+      if (effect !== "none") {
+        transfer.dropEffect = effect;
+      }
+    }
+    dropTargetKey = dropKey;
+    dropConflict = conflict;
+  }
 
-	function onSlotDragEnter(
-		event: DragEvent,
-		dropKey: string,
-		semester: PlanDetailSemester,
-		dayIso: string,
-		slot: DayLayoutSlot,
-	) {
-		applySlotDragOver(event, dropKey, semester, dayIso, slot);
-	}
+  function onSlotDragEnter(
+    event: DragEvent,
+    dropKey: string,
+    semester: PlanDetailSemester,
+    dayIso: string,
+    slot: DayLayoutSlot,
+  ) {
+    applySlotDragOver(event, dropKey, semester, dayIso, slot);
+  }
 
-	function onSlotDragOver(
-		event: DragEvent,
-		dropKey: string,
-		semester: PlanDetailSemester,
-		dayIso: string,
-		slot: DayLayoutSlot,
-	) {
-		applySlotDragOver(event, dropKey, semester, dayIso, slot);
-	}
+  function onSlotDragOver(
+    event: DragEvent,
+    dropKey: string,
+    semester: PlanDetailSemester,
+    dayIso: string,
+    slot: DayLayoutSlot,
+  ) {
+    applySlotDragOver(event, dropKey, semester, dayIso, slot);
+  }
 
   function onEntryDragStart(event: DragEvent, entry: ScheduleEntry) {
     const payload = {
@@ -233,11 +233,11 @@
     ) {
       return;
     }
-		if (dropTargetKey === dropKey) {
-			dropTargetKey = null;
-			dropConflict = false;
-		}
-	}
+    if (dropTargetKey === dropKey) {
+      dropTargetKey = null;
+      dropConflict = false;
+    }
+  }
 
   async function onSlotDrop(
     event: DragEvent,
@@ -245,11 +245,11 @@
     dayIso: string,
     slot: DayLayoutSlot,
   ) {
-		event.preventDefault();
-		dropTargetKey = null;
-		dropConflict = false;
+    event.preventDefault();
+    dropTargetKey = null;
+    dropConflict = false;
 
-		const startDateTime = buildSlotTimestamp(dayIso, slot.start);
+    const startDateTime = buildSlotTimestamp(dayIso, slot.start);
     const endDateTime = buildSlotTimestamp(dayIso, slot.end);
 
     const entryRaw =
@@ -288,11 +288,11 @@
       return;
     }
 
-		const alreadyPlaced = semester.schedule_entries.some(
-			(e) =>
-				e.plan_semester_subject_group_id === payload.groupId &&
-				entryMatchesSlot(e.start_date_time, dayIso, slot),
-		);
+    const alreadyPlaced = semester.schedule_entries.some(
+      (e) =>
+        e.plan_semester_subject_group_id === payload.groupId &&
+        entryMatchesSlot(e.start_date_time, dayIso, slot),
+    );
 
     if (alreadyPlaced) {
       return;
@@ -305,9 +305,9 @@
     });
   }
 
-	function removeScheduleEntry(entryId: string) {
-		deleteScheduleEntryMutation.mutate({ id: entryId });
-	}
+  function removeScheduleEntry(entryId: string) {
+    deleteScheduleEntryMutation.mutate({ id: entryId });
+  }
 </script>
 
 {#if semesters.length === 0}
@@ -318,52 +318,60 @@
       {#if !semester.start_date || !semester.end_date}
         <p class="text-sm">Brak dat semestru.</p>
       {:else}
-        <div class="flex flex-col gap-8">
-          {#each getWeekendDays(semester) as { weekend, days } (weekend.saturday)}
-            <section class="flex flex-col gap-4">
+        <div class="flex flex-col">
+          {#each getWeekendDays(semester) as { weekend, days }}
+            <section class="flex flex-col">
               {#each days as dayIso (dayIso)}
                 {@const slots = getDaySlots(semester, dayIso)}
                 {@const custom = hasCustomDayLayout(semester, dayIso)}
                 <div
-                  class="grid items-start gap-x-4 gap-y-2"
+                  class="grid items-start gap-x-4 gap-y-2 p-4 {dayIso ===
+                  weekend.saturday
+                    ? 'bg-black/3 dark:bg-white/4'
+                    : ''}"
                   style="grid-template-columns: {gridColumns(slots.length)}"
                 >
-                  <div class="flex items-center gap-1">
-                    <p class="text-sm">{formatIsoDayLabel(dayIso)}</p>
-                    <Tooltip label="Niestandardowe godziny">
-                      {#snippet trigger(props)}
-                        <Button
-                          {...props}
-                          type="button"
-                          variant="ghost"
-                          size="icon-sm"
-                          aria-label="Niestandardowe godziny"
-                          onclick={() => openHoursDialog(semester, dayIso)}
-                        >
-                          <ClockIcon
-                            class="size-4"
-                            weight={custom ? "fill" : "regular"}
-                          />
-                        </Button>
-                      {/snippet}
-                    </Tooltip>
-                    {#if custom}
-                      <Tooltip label="Przywróć domyślne">
+                  <div class="flex flex-col items-center gap-1 self-center">
+                    <p class="text-sm w-full">{formatIsoDayLabel(dayIso)}</p>
+                    <div class="flex items-center gap-1 justify-start w-full">
+                      <Tooltip label="Niestandardowe godziny">
                         {#snippet trigger(props)}
                           <Button
                             {...props}
                             type="button"
                             variant="ghost"
                             size="icon-sm"
-                            aria-label="Przywróć domyślne"
-                            loading={deleteDayLayoutMutation.isPending}
-                            onclick={() => restoreDefaults(semester, dayIso)}
+                            aria-label="Niestandardowe godziny"
+                            onclick={() => openHoursDialog(semester, dayIso)}
                           >
-                            <ArrowUUpLeftIcon class="size-4" weight="regular" />
+                            <ClockIcon
+                              class="size-4"
+                              weight={custom ? "fill" : "regular"}
+                            />
                           </Button>
                         {/snippet}
                       </Tooltip>
-                    {/if}
+                      {#if custom}
+                        <Tooltip label="Przywróć domyślne">
+                          {#snippet trigger(props)}
+                            <Button
+                              {...props}
+                              type="button"
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label="Przywróć domyślne"
+                              loading={deleteDayLayoutMutation.isPending}
+                              onclick={() => restoreDefaults(semester, dayIso)}
+                            >
+                              <ArrowUUpLeftIcon
+                                class="size-4"
+                                weight="regular"
+                              />
+                            </Button>
+                          {/snippet}
+                        </Tooltip>
+                      {/if}
+                    </div>
                   </div>
                   {#each slots as slot, slotIndex (`${dayIso}-${slotIndex}`)}
                     {@const dropKey = slotDropKey(dayIso, slotIndex)}
@@ -380,13 +388,28 @@
                       <div
                         role="region"
                         aria-label="Przedział {slot.start} – {slot.end}"
-                        class="flex min-h-16 flex-col gap-1 rounded-md border border-dashed p-1 transition-[box-shadow,background-color,border-color] {isTarget && dropConflict
+                        class="flex min-h-16 flex-col gap-1 rounded-md border border-dashed p-1 transition-[box-shadow,background-color,border-color] {isTarget &&
+                        dropConflict
                           ? 'cursor-not-allowed border-destructive/40 bg-destructive/5 ring-2 ring-destructive ring-offset-1 ring-offset-background'
                           : isTarget
                             ? 'border-primary/40 bg-primary/5 ring-2 ring-primary ring-offset-1 ring-offset-background'
                             : 'border-border-card'}"
-                        ondragenter={(event) => onSlotDragEnter(event, dropKey, semester, dayIso, slot)}
-                        ondragover={(event) => onSlotDragOver(event, dropKey, semester, dayIso, slot)}
+                        ondragenter={(event) =>
+                          onSlotDragEnter(
+                            event,
+                            dropKey,
+                            semester,
+                            dayIso,
+                            slot,
+                          )}
+                        ondragover={(event) =>
+                          onSlotDragOver(
+                            event,
+                            dropKey,
+                            semester,
+                            dayIso,
+                            slot,
+                          )}
                         ondragleave={(event) => onSlotDragLeave(event, dropKey)}
                         ondrop={(event) =>
                           onSlotDrop(event, semester, dayIso, slot)}
