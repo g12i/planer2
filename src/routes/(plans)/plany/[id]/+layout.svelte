@@ -6,6 +6,7 @@
   import { createQuery } from "@tanstack/svelte-query";
   import type { PlanDetail, PlanDetailSubject } from "$lib/plan-types";
 
+  import PlanSubjectSidebar from "./plan-subject-sidebar.svelte";
   import AppShell from "$lib/components/app-shell/app-shell.svelte";
   import Input from "$lib/components/ui/input.svelte";
   import ScrollArea from "$lib/components/ui/scroll-area.svelte";
@@ -53,18 +54,24 @@
     semesters.find((semester) => semester.id === activeSemesterId),
   );
 
+  const isSearching = $derived(Boolean(subjectQuery.trim()));
+
   const subjectSearcher = $derived(
     new Searcher(activeSemester?.subjects ?? [], {
       keySelector: (subject: PlanDetailSubject) => [
         subject.module_name,
         subject.module_code ?? "",
+        ...subject.groups.flatMap((group) => [
+          group.activity_kind,
+          group.label ?? "",
+        ]),
       ],
       threshold: 0.7,
     }),
   );
 
   const filteredSubjects = $derived(
-    subjectQuery.trim()
+    isSearching
       ? subjectSearcher.search(subjectQuery)
       : (activeSemester?.subjects ?? []),
   );
@@ -137,17 +144,13 @@
                 <p class="px-4 py-2 text-sm text-foreground-alt">
                   Brak przedmiotów
                 </p>
+              {:else if filteredSubjects.length === 0}
+                <p class="px-4 py-2 text-xs text-foreground-alt">Brak wyników</p>
               {:else}
-                <ul class="space-y-0.5 px-2 py-2">
-                  {#each filteredSubjects as subject (subject.id)}
-                    <li class="px-3 py-2 text-sm">{subject.module_name}</li>
-                  {/each}
-                  {#if filteredSubjects.length === 0}
-                    <li class="px-3 py-2 text-xs text-foreground-alt">
-                      Brak wyników
-                    </li>
-                  {/if}
-                </ul>
+                <PlanSubjectSidebar
+                  subjects={filteredSubjects}
+                  {isSearching}
+                />
               {/if}
             </ScrollArea>
           </div>

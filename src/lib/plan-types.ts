@@ -4,6 +4,7 @@ import type {
 	planCreateSchema,
 	planDetailSchema,
 	planDetailSemesterSchema,
+	planDetailSubjectGroupSchema,
 	planDetailSubjectSchema,
 	planListItemSchema,
 	programmeListItemSchema,
@@ -16,6 +17,10 @@ export type PlanListItem = z.infer<typeof planListItemSchema>;
 export type PlanCreate = z.infer<typeof planCreateSchema>;
 
 export type PlanCreateResponse = z.infer<typeof planCreateResponseSchema>;
+
+export type PlanDetailSubjectGroup = z.infer<
+	typeof planDetailSubjectGroupSchema
+>;
 
 export type PlanDetailSubject = z.infer<typeof planDetailSubjectSchema>;
 

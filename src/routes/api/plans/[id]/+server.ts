@@ -67,11 +67,22 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 		throw new Error(`Failed to load semesters: ${semestersError.message}`);
 	}
 
+	type SubjectRow = {
+		id: string;
+		module_code: string | null;
+		module_name: string;
+		groups: {
+			id: string;
+			activity_kind: string;
+			hours_total: number;
+			group_index: number;
+			label: string | null;
+			lecturer_usos_id: string | null;
+		}[];
+	};
+
 	const semesterIds = semesters.map((semester) => semester.id);
-	const subjectsBySemesterId = new Map<
-		string,
-		{ id: string; module_code: string | null; module_name: string }[]
-	>();
+	const subjectsBySemesterId = new Map<string, SubjectRow[]>();
 
 	if (semesterIds.length > 0) {
 		const { data: subjects, error: subjectsError } = await getSupabase()
@@ -84,12 +95,44 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 			throw new Error(`Failed to load subjects: ${subjectsError.message}`);
 		}
 
+		const subjectIds = subjects.map((subject) => subject.id);
+		const groupsBySubjectId = new Map<string, SubjectRow["groups"]>();
+
+		if (subjectIds.length > 0) {
+			const { data: groups, error: groupsError } = await getSupabase()
+				.from("plan_semester_subject_group")
+				.select(
+					"id, plan_semester_subject_id, activity_kind, hours_total, group_index, label, lecturer_usos_id",
+				)
+				.in("plan_semester_subject_id", subjectIds)
+				.order("activity_kind")
+				.order("group_index");
+
+			if (groupsError) {
+				throw new Error(`Failed to load groups: ${groupsError.message}`);
+			}
+
+			for (const group of groups) {
+				const list = groupsBySubjectId.get(group.plan_semester_subject_id) ?? [];
+				list.push({
+					id: group.id,
+					activity_kind: group.activity_kind,
+					hours_total: group.hours_total,
+					group_index: group.group_index,
+					label: group.label,
+					lecturer_usos_id: group.lecturer_usos_id,
+				});
+				groupsBySubjectId.set(group.plan_semester_subject_id, list);
+			}
+		}
+
 		for (const subject of subjects) {
 			const list = subjectsBySemesterId.get(subject.plan_semester_id) ?? [];
 			list.push({
 				id: subject.id,
 				module_code: subject.module_code,
 				module_name: subject.module_name,
+				groups: groupsBySubjectId.get(subject.id) ?? [],
 			});
 			subjectsBySemesterId.set(subject.plan_semester_id, list);
 		}

@@ -44,10 +44,20 @@ export const planCreateResponseSchema = z.object({
   id: z.string(),
 });
 
+export const planDetailSubjectGroupSchema = z.object({
+  id: z.string(),
+  activity_kind: z.string(),
+  hours_total: z.number(),
+  group_index: z.number().int().positive(),
+  label: z.string().nullable(),
+  lecturer_usos_id: z.string().nullable(),
+});
+
 export const planDetailSubjectSchema = z.object({
   id: z.string(),
   module_code: z.string().nullable(),
   module_name: z.string(),
+  groups: z.array(planDetailSubjectGroupSchema),
 });
 
 export const planDetailSemesterSchema = z.object({
