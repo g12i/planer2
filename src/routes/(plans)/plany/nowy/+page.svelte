@@ -22,6 +22,7 @@
 
 	let programmeId = $state("");
 	let planName = $state("");
+	let academicYear = $state(new Date().getFullYear());
 	let searchQuery = $state("");
 	let selectedSemesters = $state<string[]>([]);
 	let startDate = $state<DateValue | undefined>(undefined);
@@ -82,6 +83,7 @@
 	const canSubmit = $derived(
 		Boolean(programmeId) &&
 			planName.trim().length > 0 &&
+			academicYear > 0 &&
 			Boolean(startDate) &&
 			Boolean(endDate) &&
 			selectedSemesters.length > 0,
@@ -124,6 +126,7 @@
 		const parsed = planCreateSchema.safeParse({
 			programme_id: programmeId,
 			name: planName.trim(),
+			academic_year: academicYear,
 			start_date: dateValueToIso(startDate),
 			end_date: dateValueToIso(endDate),
 			semester_numbers: selectedSemesters.map((value) => Number(value)),
@@ -134,6 +137,7 @@
 			fieldError =
 				flattened.programme_id?.[0] ??
 				flattened.name?.[0] ??
+				flattened.academic_year?.[0] ??
 				flattened.start_date?.[0] ??
 				flattened.end_date?.[0] ??
 				flattened.semester_numbers?.[0] ??
@@ -176,6 +180,21 @@
 					planName = e.currentTarget.value;
 				}}
 			/>
+		</section>
+
+		<section class="flex flex-col gap-2">
+			<h2 class="text-sm font-semibold">Rok akademicki</h2>
+			<div class="flex items-center gap-1">
+				<Input
+					type="number"
+					value={academicYear}
+					oninput={(e) => {
+						academicYear = Number(e.currentTarget.value);
+					}}
+					class="w-28"
+				/>
+				<span class="text-sm text-muted-foreground">/{academicYear + 1}</span>
+			</div>
 		</section>
 
 		<section class="flex flex-col gap-4">

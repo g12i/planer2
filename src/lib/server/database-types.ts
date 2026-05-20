@@ -121,6 +121,7 @@ export type Database = {
       }
       plan: {
         Row: {
+          academic_year: number
           created_at: string
           id: string
           name: string | null
@@ -128,6 +129,7 @@ export type Database = {
           programme_name: string | null
         }
         Insert: {
+          academic_year: number
           created_at?: string
           id?: string
           name?: string | null
@@ -135,6 +137,7 @@ export type Database = {
           programme_name?: string | null
         }
         Update: {
+          academic_year?: number
           created_at?: string
           id?: string
           name?: string | null

@@ -17,12 +17,14 @@ export const planListItemSchema = z.object({
   name: z.string().nullable(),
   programme_code: z.string().nullable(),
   programme_name: z.string().nullable(),
+  academic_year: z.number(),
 });
 
 export const planCreateSchema = z
   .object({
     programme_id: z.string().min(1, "Wybierz program studiów"),
     name: z.string().min(1, "Podaj nazwę planu"),
+    academic_year: z.number().int().min(2020).max(2099),
     start_date: isoDateSchema,
     end_date: isoDateSchema,
     semester_numbers: z
@@ -170,5 +172,6 @@ export const planDetailSchema = z.object({
   name: z.string().nullable(),
   programme_code: z.string().nullable(),
   programme_name: z.string().nullable(),
+  academic_year: z.number(),
   semesters: z.array(planDetailSemesterSchema),
 });

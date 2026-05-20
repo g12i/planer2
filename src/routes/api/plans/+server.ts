@@ -47,7 +47,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
 
   const { data: plans, error: plansError } = await getSupabase()
     .from("plan")
-    .select("id, name, programme_code, programme_name")
+    .select("id, name, programme_code, programme_name, academic_year")
     .in("id", planIds)
     .order("name");
 
@@ -73,8 +73,14 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     return json({ error: "Nieprawidłowe dane formularza." }, { status: 400 });
   }
 
-  const { programme_id, name, start_date, end_date, semester_numbers } =
-    parsed.data;
+  const {
+    programme_id,
+    name,
+    academic_year,
+    start_date,
+    end_date,
+    semester_numbers,
+  } = parsed.data;
 
   const { data: programme, error: programmeError } = await getSupabase()
     .from("catalog_programme")
@@ -128,6 +134,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     name,
     programme_code: programme.code,
     programme_name: programme.name,
+    academic_year,
   });
 
   if (planError) {

@@ -51,7 +51,7 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 
 	const { data: plan, error: planError } = await getSupabase()
 		.from("plan")
-		.select("id, name, programme_code, programme_name")
+		.select("id, name, programme_code, programme_name, academic_year")
 		.eq("id", planId)
 		.maybeSingle();
 
@@ -233,6 +233,7 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 		name: plan.name,
 		programme_code: plan.programme_code,
 		programme_name: plan.programme_name,
+		academic_year: plan.academic_year,
 		semesters: semesters.map((semester) => ({
 			id: semester.id,
 			number: semester.number,
