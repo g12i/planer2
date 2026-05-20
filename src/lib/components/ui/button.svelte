@@ -14,7 +14,7 @@
             "bg-destructive text-white hover:brightness-110 active:brightness-95 focus-visible:ring-destructive",
         },
         size: {
-          default: "h-9 gap-1.5 px-3",
+          default: "py-2 gap-1.5 px-3",
           icon: "size-10 shrink-0 gap-0 p-0",
         },
       },
