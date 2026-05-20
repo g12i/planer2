@@ -30,6 +30,8 @@
     PLAN_DETAIL_KEY,
     type PlanDetailContextValue,
   } from "$lib/plan-detail-context";
+  import { scheduleConflictQueries } from "$lib/schedule-conflict-queries";
+  import type { ScheduleConflict } from "$lib/schedule-conflict-types";
   import type {
     DayLayoutSlot,
     PlanDetailSemester,
@@ -85,6 +87,21 @@
   }));
 
   const holidays = $derived(holidaysQuery.data);
+
+  const conflictsQuery = createQuery(() => ({
+    ...scheduleConflictQueries.forPlan(planId),
+    enabled: Boolean(planId),
+  }));
+
+  const conflictsByEntryId = $derived.by(() => {
+    const map = new Map<string, ScheduleConflict[]>();
+    for (const conflict of conflictsQuery.data?.conflicts ?? []) {
+      const list = map.get(conflict.entry_id) ?? [];
+      list.push(conflict);
+      map.set(conflict.entry_id, list);
+    }
+    return map;
+  });
 
   const deleteDayLayoutMutation = createMutation(() =>
     deleteDayLayoutMutationOptions(queryClient, planId),
@@ -472,6 +489,8 @@
                                 entry.id,
                                 semester.schedule_entries,
                               )}
+                              conflicts={conflictsByEntryId.get(entry.id) ??
+                                []}
                               dragging={draggingEntryId === entry.id}
                               ondragstart={(event) =>
                                 onEntryDragStart(event, entry)}

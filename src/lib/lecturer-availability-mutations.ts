@@ -6,6 +6,7 @@ import {
   invalidateLecturerList,
   removeLecturerDetail,
 } from "$lib/lecturer-availability-queries";
+import { invalidateAllScheduleConflicts } from "$lib/schedule-conflict-queries";
 import { lecturerAvailabilityCreateResponseSchema } from "$lib/lecturer-availability-schemas";
 import type {
   LecturerAvailabilityCreate,
@@ -45,6 +46,7 @@ export function saveLecturerMutationOptions(queryClient: QueryClient) {
     },
     onSuccess: async (_: unknown, formData: LecturerAvailabilityForm) => {
       await invalidateLecturerDetail(queryClient, formData.usos_id);
+      await invalidateAllScheduleConflicts(queryClient);
     },
   };
 }
@@ -60,6 +62,7 @@ export function deleteLecturerMutationOptions(queryClient: QueryClient) {
     onSuccess: async (_: unknown, usosId: string) => {
       removeLecturerDetail(queryClient, usosId);
       await invalidateLecturerList(queryClient);
+      await invalidateAllScheduleConflicts(queryClient);
       await goto("/dostepnosc-prowadzacych");
     },
   };

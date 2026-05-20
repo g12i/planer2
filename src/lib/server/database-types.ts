@@ -377,7 +377,18 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      lecturer_schedule_entries: {
+        Row: {
+          academic_year: number
+          end_date_time: string
+          entry_id: string
+          group_id: string
+          lecturer_usos_id: string
+          plan_id: string
+          start_date_time: string
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never

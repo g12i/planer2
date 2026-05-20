@@ -19,11 +19,20 @@
   } from "$lib/plan-detail-context";
   import { planQueries } from "$lib/plan-queries";
   import { updatePlanNameMutationOptions } from "$lib/plan-mutations";
+  import { invalidateScheduleConflicts } from "$lib/schedule-conflict-queries";
   import type { LayoutProps } from "./$types";
 
   let { data, children }: LayoutProps = $props();
 
   const planId = $derived(page.params.id ?? "");
+  const queryClient = useQueryClient();
+
+  $effect(() => {
+    if (!planId) {
+      return;
+    }
+    void invalidateScheduleConflicts(queryClient, planId);
+  });
 
   const detailQuery = createQuery(() => ({
     ...planQueries.detail(planId),
@@ -79,7 +88,6 @@
 
   const planTitle = $derived(plan?.name ?? plan?.programme_code ?? "Plan");
 
-  const queryClient = useQueryClient();
   const renameMutation = createMutation(() =>
     updatePlanNameMutationOptions(queryClient, planId),
   );

@@ -29,6 +29,7 @@ import type {
 	ScheduleEntryUpdate,
 	SubjectGroupsUpdate,
 } from "$lib/plan-types";
+import { invalidateScheduleConflicts } from "$lib/schedule-conflict-queries";
 import { http } from "./http";
 
 export function createPlanMutation(queryClient: QueryClient) {
@@ -155,6 +156,7 @@ export function updateSubjectGroupsMutationOptions(
 		},
 		onSuccess: async () => {
 			await invalidatePlanDetail(queryClient, planId);
+			await invalidateScheduleConflicts(queryClient, planId);
 		},
 	};
 }
@@ -229,6 +231,7 @@ export function createScheduleEntryMutationOptions(
 		},
 		onSettled: async () => {
 			await invalidatePlanDetail(queryClient, planId);
+			await invalidateScheduleConflicts(queryClient, planId);
 		},
 	};
 }
@@ -283,6 +286,7 @@ export function updateScheduleEntryMutationOptions(
 		},
 		onSettled: async () => {
 			await invalidatePlanDetail(queryClient, planId);
+			await invalidateScheduleConflicts(queryClient, planId);
 		},
 	};
 }
@@ -326,6 +330,7 @@ export function deleteScheduleEntryMutationOptions(
 		},
 		onSettled: async () => {
 			await invalidatePlanDetail(queryClient, planId);
+			await invalidateScheduleConflicts(queryClient, planId);
 		},
 	};
 }
