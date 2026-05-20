@@ -343,13 +343,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "plan_semester_subject_group_lecturer_usos_id_fkey"
-            columns: ["lecturer_usos_id"]
-            isOneToOne: false
-            referencedRelation: "lecturer_availability"
-            referencedColumns: ["usos_id"]
-          },
-          {
             foreignKeyName: "plan_semester_subject_group_plan_semester_subject_id_fkey"
             columns: ["plan_semester_subject_id"]
             isOneToOne: false
