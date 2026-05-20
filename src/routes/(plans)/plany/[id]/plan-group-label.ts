@@ -13,7 +13,7 @@ export function formatGroupTitle(
 	);
 	const showIndex = group.group_index > 1 || sameKind.length > 1;
 	return showIndex
-		? `${group.activity_kind} Gr. ${group.group_index}`
+		? `${group.activity_kind}, gr. ${group.group_index}`
 		: group.activity_kind;
 }
 

@@ -1,13 +1,13 @@
 import { queryOptions } from "@tanstack/svelte-query";
+import { http } from "$lib/http";
 import {
 	geoBuilding2WithRoomsSchema,
 	geoBuildingIndexSchema,
 	geoRoomDetailSchema,
-	USOS_BUILDING2_ROOMS_FIELDS,
 	USOS_BUILDING_INDEX_FIELDS,
+	USOS_BUILDING2_ROOMS_FIELDS,
 	USOS_ROOM_FIELDS,
 } from "$lib/usos-geo-schemas";
-import { http } from "$lib/http";
 import {
 	USOS_SEARCH2_FIELDS,
 	USOS_USER_FIELDS,
@@ -67,7 +67,7 @@ export const usosQueries = {
 
 	buildingIndex: () =>
 		queryOptions({
-			queryKey: ["usos", "geo", "building-index"] as const,
+			queryKey: ["usos", "geo", "buildings"] as const,
 			staleTime: 1000 * 60 * 60 * 24,
 			gcTime: 1000 * 60 * 60 * 48,
 			queryFn: () => {
@@ -87,7 +87,7 @@ export const usosQueries = {
 
 	buildingRooms: (buildingId: string) =>
 		queryOptions({
-			queryKey: ["usos", "geo", "building-rooms", buildingId] as const,
+			queryKey: ["usos", "geo", "buildings", buildingId, "rooms"] as const,
 			staleTime: 1000 * 60 * 60,
 			gcTime: 1000 * 60 * 60 * 24,
 			enabled: Boolean(buildingId),
@@ -109,7 +109,7 @@ export const usosQueries = {
 
 	room: (roomId: string) =>
 		queryOptions({
-			queryKey: ["usos", "geo", "room", roomId] as const,
+			queryKey: ["usos", "geo", "rooms", roomId] as const,
 			staleTime: 1000 * 60 * 60 * 24,
 			gcTime: 1000 * 60 * 60 * 48,
 			enabled: Boolean(roomId),

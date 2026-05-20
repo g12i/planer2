@@ -1,25 +1,27 @@
 <script lang="ts">
-  import { createMutation, createQuery, useQueryClient } from "@tanstack/svelte-query";
+  import {
+    createMutation,
+    useQueryClient,
+  } from "@tanstack/svelte-query";
   import PlusIcon from "phosphor-svelte/lib/PlusIcon";
   import XIcon from "phosphor-svelte/lib/XIcon";
 
   import Button from "$lib/components/ui/button.svelte";
-  import Combobox from "$lib/components/ui/combobox.svelte";
   import Dialog from "$lib/components/ui/dialog.svelte";
   import Input from "$lib/components/ui/input.svelte";
   import Separator from "$lib/components/ui/separator.svelte";
-  import { geoBuildingToOption } from "$lib/usos-geo-schemas";
+  import Tabs from "$lib/components/ui/tabs.svelte";
+  import TabsList from "$lib/components/ui/tabs-list.svelte";
+  import TabsTrigger from "$lib/components/ui/tabs-trigger.svelte";
+  import TabsContent from "$lib/components/ui/tabs-content.svelte";
   import { updateSubjectGroupsMutationOptions } from "$lib/plan-mutations";
   import { subjectGroupsUpdateSchema } from "$lib/plan-schemas";
   import type { PlanDetailSubject, SubjectGroupsUpdate } from "$lib/plan-types";
-  import { usosQueries } from "$lib/usos-queries";
 
   import { formatGroupTitle } from "./plan-group-label";
   import SubjectGroupLecturerField from "./subject-group-lecturer-field.svelte";
   import SubjectGroupRoomField from "./subject-group-room-field.svelte";
   import Tooltip from "$lib/components/ui/tooltip.svelte";
-
-  const BUILDING_STORAGE_KEY = "planer2:buildingId";
 
   type DraftGroup = {
     _key: string;
@@ -45,23 +47,9 @@
     updateSubjectGroupsMutationOptions(queryClient, planId),
   );
 
-  const buildingIndexQuery = createQuery(() => usosQueries.buildingIndex());
-
   let draftGroups = $state<DraftGroup[]>([]);
   let validationError = $state<string | null>(null);
-  let selectedBuildingId = $state("");
-  let buildingSearchQuery = $state("");
-
-  const buildingComboboxItems = $derived.by(() => {
-    const buildings = buildingIndexQuery.data ?? [];
-    const query = buildingSearchQuery.trim().toLowerCase();
-    const filtered = query
-      ? buildings.filter((building) =>
-          geoBuildingToOption(building).label.toLowerCase().includes(query),
-        )
-      : buildings;
-    return filtered.map(geoBuildingToOption);
-  });
+  let activeKindTab = $state("");
 
   function subjectToDraft(source: PlanDetailSubject): DraftGroup[] {
     return source.groups.map((group) => ({
@@ -77,22 +65,11 @@
 
   $effect(() => {
     if (open) {
-      draftGroups = subjectToDraft(subject);
+      const draft = subjectToDraft(subject);
+      draftGroups = draft;
       validationError = null;
-      if (typeof localStorage !== "undefined") {
-        const stored = localStorage.getItem(BUILDING_STORAGE_KEY);
-        if (stored) {
-          selectedBuildingId = stored;
-        }
-      }
+      activeKindTab = draft[0]?.activity_kind ?? "";
     }
-  });
-
-  $effect(() => {
-    if (!selectedBuildingId || typeof localStorage === "undefined") {
-      return;
-    }
-    localStorage.setItem(BUILDING_STORAGE_KEY, selectedBuildingId);
   });
 
   const activityKinds = $derived.by(() => {
@@ -182,11 +159,6 @@
     );
   }
 
-  function handleBuildingInput(value: string) {
-    buildingSearchQuery = value;
-    selectedBuildingId = "";
-  }
-
   async function handleSave() {
     const payload = draftToPayload(draftGroups);
     const parsed = subjectGroupsUpdateSchema.safeParse(payload);
@@ -208,119 +180,121 @@
   const isPending = $derived(updateMutation.isPending);
 </script>
 
-<Dialog bind:open size="wide">
+<Dialog bind:open >
   {#snippet title()}
-    Grupy zajęć — {subject.module_name}
+    {subject.module_name}
   {/snippet}
 
   <div class="flex flex-col gap-3">
-    <section class="flex flex-col gap-1">
-      <h3 class="text-xs font-semibold text-foreground">Budynek</h3>
-      <Combobox
-        items={buildingComboboxItems}
-        bind:value={selectedBuildingId}
-        placeholder="Wybierz budynek..."
-        searching={buildingIndexQuery.isPending}
-        oninput={handleBuildingInput}
-      />
-      {#if buildingIndexQuery.isError}
-        <p class="text-xs text-destructive">
-          Nie udało się pobrać budynków z USOS.
-        </p>
-      {/if}
-    </section>
-
     {#if draftGroups.length === 0}
       <p class="text-sm text-foreground-alt">Brak grup zajęć.</p>
     {:else}
-      {#each activityKinds as kind (kind)}
-        {@const kindGroups = groupsForKind(kind)}
-        <section class="flex flex-col gap-1">
-          <h3 class="text-xs font-semibold text-foreground">{kind}</h3>
+      <Tabs bind:value={activeKindTab}>
+        <TabsList>
+          {#each activityKinds as kind (kind)}
+            <TabsTrigger value={kind}>{kind}</TabsTrigger>
+          {/each}
+        </TabsList>
 
-          <div
-            class="divide-y divide-border-card overflow-hidden rounded-md border border-border-card"
-          >
-            {#each kindGroups as group (group._key)}
-              <div
-                class="grid grid-cols-[minmax(5rem,7rem)_4.5rem_minmax(0,1fr)_minmax(0,1fr)_2rem] items-center gap-x-2 gap-y-0 px-2 py-1.5"
-              >
-                <span class="truncate text-xs font-medium text-foreground-alt">
-                  {groupTitleForDraft(group)}
-                </span>
+        {#each activityKinds as kind (kind)}
+          <TabsContent value={kind}>
+            {@const kindGroups = groupsForKind(kind)}
+            <div class="flex flex-col gap-4 w-full">
+              {#each kindGroups as group (group._key)}
+                <div
+                  class="flex flex-col gap-3 px-3 py-3 border border-border-card rounded-md"
+                >
+                  <div class="flex items-start justify-between gap-2">
+                    <span class="text-sm font-medium text-foreground">
+                      {groupTitleForDraft(group)}
+                    </span>
+                    <Tooltip label="Usuń grupę">
+                      {#snippet trigger(props)}
+                        <Button
+                          {...props}
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          class="shrink-0"
+                          aria-label="Usuń grupę"
+                          disabled={countForKind(kind) <= 1 || isPending}
+                          onclick={() => removeGroup(group._key, kind)}
+                        >
+                          <XIcon />
+                        </Button>
+                      {/snippet}
+                    </Tooltip>
+                  </div>
 
-                <Input
-                  id="hours-{group._key}"
-                  type="number"
-                  min="0"
-                  step="1"
-                  class="w-full tabular-nums"
-                  aria-label="Godziny — {groupTitleForDraft(group)}"
-                  disabled={isPending}
-                  value={String(group.hours_total)}
-                  oninput={(event) => {
-                    const raw = event.currentTarget.value;
-                    const parsed = Number.parseInt(raw, 10);
-                    const hours = Number.isNaN(parsed) ? 0 : parsed;
-                    draftGroups = draftGroups.map((draft) =>
-                      draft._key === group._key
-                        ? { ...draft, hours_total: hours }
-                        : draft,
-                    );
-                  }}
-                />
-
-                <div class="min-w-0">
-                  {#key group._key}
-                    <SubjectGroupLecturerField
-                      bind:lecturerUsosId={group.lecturer_usos_id}
-                      disabled={isPending}
-                    />
-                  {/key}
-                </div>
-
-                <div class="min-w-0">
-                  {#key `${group._key}-${selectedBuildingId}`}
-                    <SubjectGroupRoomField
-                      buildingId={selectedBuildingId}
-                      bind:roomUsosId={group.room_usos_id}
-                      disabled={isPending}
-                    />
-                  {/key}
-                </div>
-
-                <Tooltip label="Usuń grupę">
-                  {#snippet trigger(props)}
-                    <Button
-                      {...props}
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      class="size-7 shrink-0"
-                      aria-label="Usuń grupę"
-                      disabled={countForKind(kind) <= 1 || isPending}
-                      onclick={() => removeGroup(group._key, kind)}
+                  <div class="flex flex-col gap-1">
+                    <label
+                      for="hours-{group._key}"
+                      class="text-xs text-foreground-alt"
                     >
-                      <XIcon />
-                    </Button>
-                  {/snippet}
-                </Tooltip>
-              </div>
-            {/each}
-          </div>
+                      Godziny
+                    </label>
+                    <Input
+                      id="hours-{group._key}"
+                      type="number"
+                      min="0"
+                      step="1"
+                      class="w-24 tabular-nums"
+                      disabled={isPending}
+                      value={String(group.hours_total)}
+                      oninput={(event) => {
+                        const raw = event.currentTarget.value;
+                        const parsed = Number.parseInt(raw, 10);
+                        const hours = Number.isNaN(parsed) ? 0 : parsed;
+                        draftGroups = draftGroups.map((draft) =>
+                          draft._key === group._key
+                            ? { ...draft, hours_total: hours }
+                            : draft,
+                        );
+                      }}
+                    />
+                  </div>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            disabled={isPending}
-            onclick={() => addGroup(kind)}
-          >
-            <PlusIcon />
-            Dodaj grupę
-          </Button>
-        </section>
-      {/each}
+                  <div class="flex flex-col gap-1">
+                    <span class="text-xs text-foreground-alt">
+                      Prowadzący
+                    </span>
+                    <div class="min-w-0">
+                      {#key group._key}
+                        <SubjectGroupLecturerField
+                          bind:lecturerUsosId={group.lecturer_usos_id}
+                          disabled={isPending}
+                        />
+                      {/key}
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-1">
+                    <span class="text-xs text-foreground-alt">Sala</span>
+                    <div class="min-w-0">
+                      {#key group._key}
+                        <SubjectGroupRoomField
+                          bind:roomUsosId={group.room_usos_id}
+                          disabled={isPending}
+                        />
+                      {/key}
+                    </div>
+                  </div>
+                </div>
+              {/each}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={isPending}
+                onclick={() => addGroup(kind)}
+              >
+                <PlusIcon />
+                Dodaj grupę
+              </Button>
+            </div>
+          </TabsContent>
+        {/each}
+      </Tabs>
     {/if}
 
     {#if validationError}

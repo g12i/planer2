@@ -7,8 +7,7 @@
   import ComboboxEmpty from "$lib/components/ui/combobox-empty.svelte";
   import ComboboxItem from "$lib/components/ui/combobox-item.svelte";
   import ComboboxStaffItem from "$lib/components/ui/combobox-staff-item.svelte";
-  import { inputWrapperVariants } from "$lib/components/ui/input.svelte";
-  import { cn } from "$lib/utils/cn";
+  import Input from "$lib/components/ui/input.svelte";
 
   type ComboboxOption = {
     value: string;
@@ -76,7 +75,6 @@
     }
   }
 
-  const inputClass = cn(inputWrapperVariants(), "w-full pe-9");
   const mergedRootProps = $derived(
     mergeProps(rootProps, {
       onOpenChangeComplete: handleOpenChangeComplete,
@@ -93,29 +91,35 @@
   {...mergedRootProps}
 >
   <div class="relative w-full">
-    <Combobox.Input
-      class={inputClass}
-      {placeholder}
-      oninput={handleInput}
-    />
-    <Combobox.Trigger
-      class="text-foreground-alt absolute inset-e-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md outline-hidden hover:bg-muted"
-    >
-      {#if searching}
-        <CircleNotchIcon
-          class="size-4 animate-spin text-foreground-alt"
-          weight="regular"
-          aria-hidden="true"
-        />
-      {:else if trigger}
-        {@render trigger()}
-      {:else}
-        <CaretUpDownIcon />
-      {/if}
-    </Combobox.Trigger>
+    <Input disabled={rootProps.disabled}>
+      <Combobox.Input
+        class="w-full truncate"
+        {placeholder}
+        oninput={handleInput}
+      />
+      {#snippet right()}
+        <Combobox.Trigger
+          class="text-foreground-alt flex items-center justify-center rounded-md outline-hidden hover:bg-black/4 hover:text-foreground dark:hover:bg-white/4 dark:active:bg-white/8 p-0.5 -m-0.5"
+        >
+          {#if searching}
+            <CircleNotchIcon
+              class="size-4 animate-spin text-foreground-alt"
+              weight="regular"
+              aria-hidden="true"
+            />
+          {:else if trigger}
+            {@render trigger()}
+          {:else}
+            <CaretUpDownIcon />
+          {/if}
+        </Combobox.Trigger>
+      {/snippet}
+    </Input>
   </div>
   <Combobox.Portal>
-    <Combobox.Content class="border-border-card bg-background shadow-popover z-50 max-h-[var(--bits-combobox-content-available-height)] w-[var(--bits-combobox-anchor-width)] min-w-48 rounded-lg border p-1 outline-hidden">
+    <Combobox.Content
+      class="border-border-card bg-background shadow-popover z-50 max-h-[var(--bits-combobox-content-available-height)] w-[var(--bits-combobox-anchor-width)] min-w-48 rounded-lg border p-1 outline-hidden"
+    >
       <Combobox.Viewport class="max-h-60 p-1">
         {#if content}
           {@render content({ filteredItems })}

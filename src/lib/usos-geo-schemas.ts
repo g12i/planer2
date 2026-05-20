@@ -29,12 +29,13 @@ export const geoBuilding2WithRoomsSchema = z.object({
 export const geoRoomDetailSchema = z.object({
 	id: z.string(),
 	number: z.string(),
+	building: geoBuildingSchema,
 });
 
 export const USOS_BUILDING_INDEX_FIELDS = "id|name|postal_address";
 export const USOS_BUILDING2_ROOMS_FIELDS =
 	"id|name|rooms[id|number|capacity|type]";
-export const USOS_ROOM_FIELDS = "id|number";
+export const USOS_ROOM_FIELDS = "id|number|building[id|name|postal_address]";
 
 export function formatGeoBuildingLabel(
 	building: z.infer<typeof geoBuildingSchema>,

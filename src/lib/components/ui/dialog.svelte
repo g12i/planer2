@@ -7,7 +7,7 @@
       variants: {
         size: {
           default: "gap-4 p-6 sm:max-w-lg",
-          wide: "gap-3 p-5 sm:max-w-2xl",
+          wide: "gap-3 p-5 sm:max-w-2xl md:max-w-3xl",
         },
       },
       defaultVariants: {
@@ -24,6 +24,7 @@
   import type { Snippet } from "svelte";
 
   import { cn } from "$lib/utils/cn";
+  import ScrollArea from "./scroll-area.svelte";
 
   type Props = WithoutChild<Dialog.RootProps> &
     VariantProps<typeof dialogContentVariants> & {
