@@ -7,26 +7,9 @@ import {
 } from "$lib/plan-schemas";
 import { parseDaySlots } from "$lib/server/planner-schemas";
 import type { DayLayout, PlanDetail, ScheduleEntry } from "$lib/plan-types";
-import { getSessionUser, parseSessionId } from "$lib/server/auth";
-import { getSessionCookieName } from "$lib/server/session";
+import { requireUser } from "$lib/server/auth";
 import { getSupabase } from "$lib/server/supabase";
 import type { RequestHandler } from "./$types";
-
-async function requireUser(cookies: {
-	get: (name: string) => string | undefined;
-}) {
-	const sessionId = parseSessionId(cookies.get(getSessionCookieName()));
-	if (!sessionId) {
-		error(401, "Unauthorized");
-	}
-
-	const user = await getSessionUser(sessionId);
-	if (!user) {
-		error(401, "Unauthorized");
-	}
-
-	return user;
-}
 
 export const GET: RequestHandler = async ({ params, cookies }) => {
 	const user = await requireUser(cookies);

@@ -1,28 +1,11 @@
-import { error, json } from "@sveltejs/kit";
+import { json } from "@sveltejs/kit";
 import { v7 as uuidv7 } from "uuid";
 import { planCreateSchema } from "$lib/plan-schemas";
 import type { PlanCreateResponse } from "$lib/plan-types";
-import { getSessionUser, parseSessionId } from "$lib/server/auth";
+import { requireUser } from "$lib/server/auth";
 import { parseSubjectActivities } from "$lib/server/planner-schemas";
-import { getSessionCookieName } from "$lib/server/session";
 import { getSupabase } from "$lib/server/supabase";
 import type { RequestHandler } from "./$types";
-
-async function requireUser(cookies: {
-  get: (name: string) => string | undefined;
-}) {
-  const sessionId = parseSessionId(cookies.get(getSessionCookieName()));
-  if (!sessionId) {
-    error(401, "Unauthorized");
-  }
-
-  const user = await getSessionUser(sessionId);
-  if (!user) {
-    error(401, "Unauthorized");
-  }
-
-  return user;
-}
 
 async function deletePlan(planId: string) {
   await getSupabase().from("plan").delete().eq("id", planId);

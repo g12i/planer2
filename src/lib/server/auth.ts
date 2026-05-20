@@ -1,4 +1,5 @@
 import { randomBytes, timingSafeEqual } from "node:crypto";
+import { error } from "@sveltejs/kit";
 import type { z } from "zod";
 import { assertUserAccess } from "$lib/server/access-guard";
 import {
@@ -14,6 +15,7 @@ import type {
 } from "$lib/server/auth-types";
 import { decryptToJson, encryptJson } from "$lib/server/crypto";
 import { getRedis } from "$lib/server/redis";
+import { getSessionCookieName } from "$lib/server/session";
 import { deleteUser, resolveUser } from "$lib/server/users";
 import {
   fetchUsosAccessToken,
@@ -229,6 +231,22 @@ export async function completeUsosOAuth(params: {
     });
     throw error;
   }
+}
+
+export async function requireUser(cookies: {
+  get: (name: string) => string | undefined;
+}): Promise<AuthUser> {
+  const sessionId = parseSessionId(cookies.get(getSessionCookieName()));
+  if (!sessionId) {
+    error(401, "Unauthorized");
+  }
+
+  const user = await getSessionUser(sessionId);
+  if (!user) {
+    error(401, "Unauthorized");
+  }
+
+  return user;
 }
 
 function readRedis<T>(

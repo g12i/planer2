@@ -6,26 +6,9 @@ import {
 	scheduleEntrySchema,
 	scheduleEntryUpdateSchema,
 } from "$lib/plan-schemas";
-import { getSessionUser, parseSessionId } from "$lib/server/auth";
-import { getSessionCookieName } from "$lib/server/session";
+import { requireUser } from "$lib/server/auth";
 import { getSupabase } from "$lib/server/supabase";
 import type { RequestHandler } from "./$types";
-
-async function requireUser(cookies: {
-	get: (name: string) => string | undefined;
-}) {
-	const sessionId = parseSessionId(cookies.get(getSessionCookieName()));
-	if (!sessionId) {
-		error(401, "Unauthorized");
-	}
-
-	const user = await getSessionUser(sessionId);
-	if (!user) {
-		error(401, "Unauthorized");
-	}
-
-	return user;
-}
 
 async function requirePlanOwnership(planId: string, userId: string) {
 	const { data: ownership, error: ownershipError } = await getSupabase()
