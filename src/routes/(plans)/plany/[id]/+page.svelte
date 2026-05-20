@@ -8,7 +8,7 @@
     useQueryClient,
   } from "@tanstack/svelte-query";
   import ArrowUUpLeftIcon from "phosphor-svelte/lib/ArrowUUpLeftIcon";
-  import CalendarCheckIcon from "phosphor-svelte/lib/CalendarCheckIcon";
+  import CalendarIcon from "phosphor-svelte/lib/CalendarIcon";
   import ClockIcon from "phosphor-svelte/lib/ClockIcon";
 
   import TabsContent from "$lib/components/ui/tabs-content.svelte";
@@ -366,21 +366,21 @@
                   style="grid-template-columns: {gridColumns(slots.length)}"
                 >
                   <div class="flex flex-col items-center gap-1 self-center">
-                    <p class="text-sm w-full">{formatIsoDayLabel(dayIso)}</p>
-                    <div class="flex items-center gap-1 justify-start w-full">
+                    <p class="text-sm w-full flex items-center gap-1">
+                      {formatIsoDayLabel(dayIso)}
                       {#if holidayName}
                         <Tooltip label={holidayName}>
                           {#snippet trigger(props)}
-                            <span
+                            <CalendarIcon
                               {...props}
-                              class="inline-flex size-8 items-center justify-center text-red-500"
+                              class="size-3.5 fill-red-500"
                               aria-label={holidayName}
-                            >
-                              <CalendarCheckIcon class="size-4" weight="fill" />
-                            </span>
+                            />
                           {/snippet}
                         </Tooltip>
                       {/if}
+                    </p>
+                    <div class="flex items-center gap-1 justify-start w-full">
                       <Tooltip label="Niestandardowe godziny">
                         {#snippet trigger(props)}
                           <Button
