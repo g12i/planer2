@@ -142,7 +142,7 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 			const { data: groups, error: groupsError } = await getSupabase()
 				.from("plan_semester_subject_group")
 				.select(
-					"id, plan_semester_subject_id, activity_kind, hours_total, group_index, label, lecturer_usos_id",
+					"id, plan_semester_subject_id, activity_kind, hours_total, group_index, label, lecturer_usos_id, room_usos_id",
 				)
 				.in("plan_semester_subject_id", subjectIds)
 				.order("activity_kind")
@@ -165,6 +165,7 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 					group_index: group.group_index,
 					label: group.label,
 					lecturer_usos_id: group.lecturer_usos_id,
+					room_usos_id: group.room_usos_id,
 				});
 				groupsBySubjectId.set(group.plan_semester_subject_id, list);
 
@@ -181,7 +182,7 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 				const { data: entries, error: entriesError } = await getSupabase()
 					.from("plan_schedule_entry")
 					.select(
-						"id, plan_semester_subject_group_id, start_date_time, end_date_time, room_usos_id",
+						"id, plan_semester_subject_group_id, start_date_time, end_date_time",
 					)
 				.in("plan_semester_subject_group_id", groupIds)
 				.order("start_date_time")
@@ -207,7 +208,6 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 							row.plan_semester_subject_group_id,
 						start_date_time: row.start_date_time,
 						end_date_time: row.end_date_time,
-						room_usos_id: row.room_usos_id,
 					});
 
 					const list = scheduleEntriesBySemesterId.get(semesterId) ?? [];

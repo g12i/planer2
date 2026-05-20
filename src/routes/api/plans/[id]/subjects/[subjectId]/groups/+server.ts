@@ -118,13 +118,14 @@ export const PUT: RequestHandler = async ({
 		group_index: group.group_index,
 		label: group.label,
 		lecturer_usos_id: group.lecturer_usos_id,
+		room_usos_id: group.room_usos_id,
 	}));
 
 	const { data: inserted, error: insertError } = await getSupabase()
 		.from("plan_semester_subject_group")
 		.insert(insertRows)
 		.select(
-			"id, activity_kind, hours_total, group_index, label, lecturer_usos_id",
+			"id, activity_kind, hours_total, group_index, label, lecturer_usos_id, room_usos_id",
 		)
 		.order("activity_kind")
 		.order("group_index");
@@ -141,6 +142,7 @@ export const PUT: RequestHandler = async ({
 			group_index: row.group_index,
 			label: row.label,
 			lecturer_usos_id: row.lecturer_usos_id,
+			room_usos_id: row.room_usos_id,
 		}),
 	);
 

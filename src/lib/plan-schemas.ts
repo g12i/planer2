@@ -57,6 +57,7 @@ export const planDetailSubjectGroupSchema = z.object({
   group_index: z.number().int().positive(),
   label: z.string().nullable(),
   lecturer_usos_id: z.string().nullable(),
+  room_usos_id: z.string().nullable(),
 });
 
 export const planDetailSubjectSchema = z.object({
@@ -72,6 +73,7 @@ export const subjectGroupUpdateItemSchema = z.object({
   group_index: z.number().int().positive(),
   label: z.string().nullable(),
   lecturer_usos_id: z.string().nullable(),
+  room_usos_id: z.string().nullable(),
 });
 
 export const subjectGroupsUpdateSchema = z
@@ -128,7 +130,6 @@ export const scheduleEntrySchema = z.object({
   plan_semester_subject_group_id: z.string(),
   start_date_time: isoDateTimeSchema,
   end_date_time: isoDateTimeSchema,
-  room_usos_id: z.string().nullable(),
 });
 
 export const scheduleEntryCreateSchema = z

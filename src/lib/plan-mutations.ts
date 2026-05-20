@@ -191,7 +191,6 @@ export function createScheduleEntryMutationOptions(
 				plan_semester_subject_group_id: data.plan_semester_subject_group_id,
 				start_date_time: data.start_date_time,
 				end_date_time: data.end_date_time,
-				room_usos_id: null,
 			};
 
 			const previous = optimisticAddScheduleEntry(

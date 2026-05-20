@@ -103,9 +103,9 @@ Unique: `catalog_subject (catalog_programme_id, module_code, semester_number)` w
 | `plan_ownership` | `plan_id` + `user_id` + `role` |
 | `plan_semester` | `plan_id`, `number`, `start_date`, `end_date` (`date`, nullable in DB; set on create) |
 | `plan_semester_subject` | Module snapshot: `module_code`, `module_name` |
-| `plan_semester_subject_group` | `activity_kind`, `hours_total`, `group_index`, optional `lecturer_usos_id` (USOS staff id; display name resolved via USOS `user`; no FK to `lecturer_availability`) |
+| `plan_semester_subject_group` | `activity_kind`, `hours_total`, `group_index`, optional `lecturer_usos_id` (USOS staff id; display name resolved via USOS `user`; no FK to `lecturer_availability`), optional `room_usos_id` (USOS room id; display number resolved via USOS `geo/room`) |
 | `plan_semester_day_layout` | `date`, `slots` (JSONB — validate with `parseDaySlots`) |
-| `plan_schedule_entry` | Concrete slot for a group (`start_date_time`, `end_date_time`, optional `room_usos_id`) |
+| `plan_schedule_entry` | Concrete slot for a group (`start_date_time`, `end_date_time`) |
 
 **Other**: `lecturer_availability` keyed by `usos_id` (referenced from `plan_semester_subject_group`).
 

@@ -25,13 +25,14 @@ export const usosSearch2ResponseSchema = z.looseObject({
 export const USOS_SEARCH2_FIELDS =
   "items[match|user[id|first_name|last_name|titles]]";
 
-/** `services/users/user` — single user by `user_id` query param (no `titles` on this method). */
-export const USOS_USER_FIELDS = "id|first_name|last_name";
+/** `services/users/user` — single user by `user_id` query param. */
+export const USOS_USER_FIELDS = "id|first_name|last_name|titles";
 
 export const usosUserSchema = z.looseObject({
   id: z.string().min(1),
   first_name: z.string().optional(),
   last_name: z.string().optional(),
+  titles: usosTitlesSchema.optional(),
 });
 
 export function formatUsosUserDisplayName(

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { createQuery } from "@tanstack/svelte-query";
   import {
     activityCardColor,
     activityCardStyle,
@@ -10,16 +11,25 @@
   import DropdownMenuItem from "$lib/components/ui/dropdown-menu-item.svelte";
   import type { PlanDetailSubjectGroup } from "$lib/plan-types";
   import { theme } from "$lib/theme.svelte";
-  import ListIcon from "phosphor-svelte/lib/ListIcon";
+  import { usosQueries } from "$lib/usos-queries";
+  import {
+    formatUsosUserDisplayName,
+    formatUsosUserStoredName,
+  } from "$lib/usos-users-schemas";
   import SlidersHorizontalIcon from "phosphor-svelte/lib/SlidersHorizontalIcon";
   import TrashIcon from "phosphor-svelte/lib/TrashIcon";
 
-  import { formatGroupTitle } from "./plan-group-label";
+  import {
+    formatActivityKindLine,
+    formatGroupTitle,
+    shouldShowGroupLabel,
+  } from "./plan-group-label";
 
   type Props = {
     subjectName: string;
     group: PlanDetailSubjectGroup;
     groups: PlanDetailSubjectGroup[];
+    cumulativeHours: number;
     dragging: boolean;
     ondragstart: (event: DragEvent) => void;
     ondragend: () => void;
@@ -30,6 +40,7 @@
     subjectName,
     group,
     groups,
+    cumulativeHours,
     dragging,
     ondragstart,
     ondragend,
@@ -43,6 +54,55 @@
       groupIndex: group.group_index,
     }),
   );
+
+  const lecturerQuery = createQuery(() => ({
+    ...usosQueries.user(group.lecturer_usos_id as string),
+    enabled: Boolean(group.lecturer_usos_id),
+  }));
+
+  const roomQuery = createQuery(() => ({
+    ...usosQueries.room(group.room_usos_id as string),
+    enabled: Boolean(group.room_usos_id),
+  }));
+
+  const lecturerLine = $derived.by(() => {
+    if (!group.lecturer_usos_id) {
+      return " — ";
+    }
+    if (lecturerQuery.data) {
+      return formatUsosUserStoredName(lecturerQuery.data);
+    }
+    if (lecturerQuery.isPending) {
+      return "…";
+    }
+    return formatUsosUserDisplayName({ id: group.lecturer_usos_id });
+  });
+
+  const activityKindLine = $derived(
+    formatActivityKindLine(group, groups),
+  );
+
+  const hoursLine = $derived(`${cumulativeHours}/${group.hours_total}`);
+
+  const groupLine = $derived.by(() => {
+    if (!shouldShowGroupLabel(group, groups)) {
+      return null;
+    }
+    return formatGroupTitle(group, groups);
+  });
+
+  const roomLine = $derived.by(() => {
+    if (!group.room_usos_id) {
+      return null;
+    }
+    if (roomQuery.data) {
+      return roomQuery.data.number;
+    }
+    if (roomQuery.isPending) {
+      return "…";
+    }
+    return null;
+  });
 </script>
 
 <div
@@ -70,8 +130,31 @@
         ? 'opacity-75'
         : 'text-foreground-alt'}"
     >
-      {formatGroupTitle(group, groups)}
+      {activityKindLine}
     </p>
+    <p
+      class="truncate {cardColors.enabled
+        ? 'opacity-75'
+        : 'text-foreground-alt'}"
+    >
+      {lecturerLine}
+    </p>
+    <p
+      class="truncate tabular-nums {cardColors.enabled
+        ? 'opacity-75'
+        : 'text-foreground-alt'}"
+    >
+      {hoursLine}
+    </p>
+    {#if roomLine}
+      <p
+        class="truncate {cardColors.enabled
+          ? 'opacity-75'
+          : 'text-foreground-alt'}"
+      >
+        {roomLine}
+      </p>
+    {/if}
   </div>
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div class="shrink-0" onpointerdown={(event) => event.stopPropagation()}>

@@ -188,7 +188,6 @@ export type Database = {
           end_date_time: string
           id: string
           plan_semester_subject_group_id: string
-          room_usos_id: string | null
           start_date_time: string
         }
         Insert: {
@@ -196,7 +195,6 @@ export type Database = {
           end_date_time: string
           id?: string
           plan_semester_subject_group_id: string
-          room_usos_id?: string | null
           start_date_time: string
         }
         Update: {
@@ -204,7 +202,6 @@ export type Database = {
           end_date_time?: string
           id?: string
           plan_semester_subject_group_id?: string
-          room_usos_id?: string | null
           start_date_time?: string
         }
         Relationships: [
@@ -323,6 +320,7 @@ export type Database = {
           label: string | null
           lecturer_usos_id: string | null
           plan_semester_subject_id: string
+          room_usos_id: string | null
         }
         Insert: {
           activity_kind: string
@@ -333,6 +331,7 @@ export type Database = {
           label?: string | null
           lecturer_usos_id?: string | null
           plan_semester_subject_id: string
+          room_usos_id?: string | null
         }
         Update: {
           activity_kind?: string
@@ -343,6 +342,7 @@ export type Database = {
           label?: string | null
           lecturer_usos_id?: string | null
           plan_semester_subject_id?: string
+          room_usos_id?: string | null
         }
         Relationships: [
           {

@@ -1,19 +1,25 @@
 <script lang="ts">
-  import { createMutation, useQueryClient } from "@tanstack/svelte-query";
+  import { createMutation, createQuery, useQueryClient } from "@tanstack/svelte-query";
   import PlusIcon from "phosphor-svelte/lib/PlusIcon";
   import XIcon from "phosphor-svelte/lib/XIcon";
 
   import Button from "$lib/components/ui/button.svelte";
+  import Combobox from "$lib/components/ui/combobox.svelte";
   import Dialog from "$lib/components/ui/dialog.svelte";
   import Input from "$lib/components/ui/input.svelte";
   import Separator from "$lib/components/ui/separator.svelte";
+  import { geoBuildingToOption } from "$lib/usos-geo-schemas";
   import { updateSubjectGroupsMutationOptions } from "$lib/plan-mutations";
   import { subjectGroupsUpdateSchema } from "$lib/plan-schemas";
   import type { PlanDetailSubject, SubjectGroupsUpdate } from "$lib/plan-types";
+  import { usosQueries } from "$lib/usos-queries";
 
   import { formatGroupTitle } from "./plan-group-label";
   import SubjectGroupLecturerField from "./subject-group-lecturer-field.svelte";
+  import SubjectGroupRoomField from "./subject-group-room-field.svelte";
   import Tooltip from "$lib/components/ui/tooltip.svelte";
+
+  const BUILDING_STORAGE_KEY = "planer2:buildingId";
 
   type DraftGroup = {
     _key: string;
@@ -22,6 +28,7 @@
     group_index: number;
     label: string | null;
     lecturer_usos_id: string | null;
+    room_usos_id: string | null;
   };
 
   type Props = {
@@ -38,8 +45,23 @@
     updateSubjectGroupsMutationOptions(queryClient, planId),
   );
 
+  const buildingIndexQuery = createQuery(() => usosQueries.buildingIndex());
+
   let draftGroups = $state<DraftGroup[]>([]);
   let validationError = $state<string | null>(null);
+  let selectedBuildingId = $state("");
+  let buildingSearchQuery = $state("");
+
+  const buildingComboboxItems = $derived.by(() => {
+    const buildings = buildingIndexQuery.data ?? [];
+    const query = buildingSearchQuery.trim().toLowerCase();
+    const filtered = query
+      ? buildings.filter((building) =>
+          geoBuildingToOption(building).label.toLowerCase().includes(query),
+        )
+      : buildings;
+    return filtered.map(geoBuildingToOption);
+  });
 
   function subjectToDraft(source: PlanDetailSubject): DraftGroup[] {
     return source.groups.map((group) => ({
@@ -49,6 +71,7 @@
       group_index: group.group_index,
       label: group.label,
       lecturer_usos_id: group.lecturer_usos_id,
+      room_usos_id: group.room_usos_id,
     }));
   }
 
@@ -56,7 +79,20 @@
     if (open) {
       draftGroups = subjectToDraft(subject);
       validationError = null;
+      if (typeof localStorage !== "undefined") {
+        const stored = localStorage.getItem(BUILDING_STORAGE_KEY);
+        if (stored) {
+          selectedBuildingId = stored;
+        }
+      }
     }
+  });
+
+  $effect(() => {
+    if (!selectedBuildingId || typeof localStorage === "undefined") {
+      return;
+    }
+    localStorage.setItem(BUILDING_STORAGE_KEY, selectedBuildingId);
   });
 
   const activityKinds = $derived.by(() => {
@@ -94,6 +130,7 @@
         group_index: maxIndex + 1,
         label: template?.label ?? null,
         lecturer_usos_id: null,
+        room_usos_id: null,
       },
     ];
   }
@@ -118,6 +155,7 @@
       group_index: group.group_index,
       label: group.label,
       lecturer_usos_id: group.lecturer_usos_id || null,
+      room_usos_id: group.room_usos_id || null,
     }));
   }
 
@@ -130,6 +168,7 @@
         group_index: group.group_index,
         label: group.label,
         lecturer_usos_id: group.lecturer_usos_id,
+        room_usos_id: group.room_usos_id,
       },
       draftGroups.map((draft) => ({
         id: draft._key,
@@ -138,8 +177,14 @@
         group_index: draft.group_index,
         label: draft.label,
         lecturer_usos_id: draft.lecturer_usos_id,
+        room_usos_id: draft.room_usos_id,
       })),
     );
+  }
+
+  function handleBuildingInput(value: string) {
+    buildingSearchQuery = value;
+    selectedBuildingId = "";
   }
 
   async function handleSave() {
@@ -169,6 +214,22 @@
   {/snippet}
 
   <div class="flex flex-col gap-3">
+    <section class="flex flex-col gap-1">
+      <h3 class="text-xs font-semibold text-foreground">Budynek</h3>
+      <Combobox
+        items={buildingComboboxItems}
+        bind:value={selectedBuildingId}
+        placeholder="Wybierz budynek..."
+        searching={buildingIndexQuery.isPending}
+        oninput={handleBuildingInput}
+      />
+      {#if buildingIndexQuery.isError}
+        <p class="text-xs text-destructive">
+          Nie udało się pobrać budynków z USOS.
+        </p>
+      {/if}
+    </section>
+
     {#if draftGroups.length === 0}
       <p class="text-sm text-foreground-alt">Brak grup zajęć.</p>
     {:else}
@@ -182,7 +243,7 @@
           >
             {#each kindGroups as group (group._key)}
               <div
-                class="grid grid-cols-[minmax(5rem,7rem)_4.5rem_minmax(0,1fr)_2rem] items-center gap-x-2 gap-y-0 px-2 py-1.5"
+                class="grid grid-cols-[minmax(5rem,7rem)_4.5rem_minmax(0,1fr)_minmax(0,1fr)_2rem] items-center gap-x-2 gap-y-0 px-2 py-1.5"
               >
                 <span class="truncate text-xs font-medium text-foreground-alt">
                   {groupTitleForDraft(group)}
@@ -217,6 +278,17 @@
                     />
                   {/key}
                 </div>
+
+                <div class="min-w-0">
+                  {#key `${group._key}-${selectedBuildingId}`}
+                    <SubjectGroupRoomField
+                      buildingId={selectedBuildingId}
+                      bind:roomUsosId={group.room_usos_id}
+                      disabled={isPending}
+                    />
+                  {/key}
+                </div>
+
                 <Tooltip label="Usuń grupę">
                   {#snippet trigger(props)}
                     <Button

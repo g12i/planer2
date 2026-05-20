@@ -23,6 +23,30 @@ function entryDurationAcademicHours(entry: ScheduleEntry): number {
 	return Math.round(realMinutesToAcademicHours(entryRealMinutes(entry)));
 }
 
+export function cumulativeHoursForEntry(
+	groupId: string,
+	entryId: string,
+	entries: ScheduleEntry[],
+): number {
+	const groupEntries = entries
+		.filter((e) => e.plan_semester_subject_group_id === groupId)
+		.sort(
+			(a, b) =>
+				a.start_date_time.localeCompare(b.start_date_time) ||
+				a.id.localeCompare(b.id),
+		);
+
+	let total = 0;
+	for (const current of groupEntries) {
+		total += entryDurationAcademicHours(current);
+		if (current.id === entryId) {
+			return total;
+		}
+	}
+
+	return 0;
+}
+
 export function scheduledHoursForGroup(
 	groupId: string,
 	entries: ScheduleEntry[],

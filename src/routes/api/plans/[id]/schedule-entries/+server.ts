@@ -143,7 +143,7 @@ export const POST: RequestHandler = async ({ params, request, cookies }) => {
 			end_date_time,
 		})
 		.select(
-			"id, plan_semester_subject_group_id, start_date_time, end_date_time, room_usos_id",
+			"id, plan_semester_subject_group_id, start_date_time, end_date_time",
 		)
 		.single();
 
@@ -160,7 +160,6 @@ export const POST: RequestHandler = async ({ params, request, cookies }) => {
 				inserted.plan_semester_subject_group_id,
 			start_date_time: inserted.start_date_time,
 			end_date_time: inserted.end_date_time,
-			room_usos_id: inserted.room_usos_id,
 		}),
 	);
 };
@@ -190,7 +189,7 @@ export const PUT: RequestHandler = async ({ params, request, cookies }) => {
 		.update({ start_date_time, end_date_time })
 		.eq("id", id)
 		.select(
-			"id, plan_semester_subject_group_id, start_date_time, end_date_time, room_usos_id",
+			"id, plan_semester_subject_group_id, start_date_time, end_date_time",
 		)
 		.single();
 
@@ -207,7 +206,6 @@ export const PUT: RequestHandler = async ({ params, request, cookies }) => {
 				updated.plan_semester_subject_group_id,
 			start_date_time: updated.start_date_time,
 			end_date_time: updated.end_date_time,
-			room_usos_id: updated.room_usos_id,
 		}),
 	);
 };

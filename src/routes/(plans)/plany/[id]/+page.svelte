@@ -39,6 +39,7 @@
   } from "$lib/plan-types";
 
   import CustomHoursDialog from "./custom-hours-dialog.svelte";
+  import { cumulativeHoursForEntry } from "./plan-group-hours";
   import { dragState } from "./plan-drag-state.svelte";
   import ScheduleEntryCard from "./schedule-entry-card.svelte";
   import {
@@ -466,6 +467,11 @@
                               subjectName={groupContext.subject.module_name}
                               group={groupContext.group}
                               groups={groupContext.subject.groups}
+                              cumulativeHours={cumulativeHoursForEntry(
+                                entry.plan_semester_subject_group_id,
+                                entry.id,
+                                semester.schedule_entries,
+                              )}
                               dragging={draggingEntryId === entry.id}
                               ondragstart={(event) =>
                                 onEntryDragStart(event, entry)}
