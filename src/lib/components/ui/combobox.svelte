@@ -25,6 +25,7 @@
     Omit<Combobox.RootProps, "type" | "items" | "value" | "open" | "inputValue">
   > & {
     value?: string;
+    inputValue?: string;
     open?: boolean;
     items: ComboboxOption[];
     placeholder?: string;
@@ -38,6 +39,7 @@
 
   let {
     value = $bindable(),
+    inputValue = $bindable(""),
     open = $bindable(false),
     items,
     placeholder,
@@ -50,18 +52,16 @@
     ...rootProps
   }: Props = $props();
 
-  let searchValue = $state("");
-
   const filteredItems = $derived.by(() => {
     if (!filter) {
       return items;
     }
 
-    if (searchValue === "") {
+    if (inputValue === "") {
       return items;
     }
 
-    const query = searchValue.toLowerCase();
+    const query = inputValue.toLowerCase();
     return items.filter((item) => item.label.toLowerCase().includes(query));
   });
 
@@ -71,7 +71,8 @@
 
   function handleOpenChangeComplete(isOpen: boolean) {
     if (!isOpen) {
-      searchValue = "";
+      const match = items.find((item) => item.value === value);
+      inputValue = match?.label ?? "";
     }
   }
 
@@ -88,7 +89,7 @@
   {items}
   bind:value
   bind:open
-  bind:inputValue={searchValue}
+  bind:inputValue
   {...mergedRootProps}
 >
   <div class="relative w-full">
