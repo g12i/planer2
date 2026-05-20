@@ -8,7 +8,7 @@
   import Combobox from "$lib/components/ui/combobox.svelte";
   import { createLecturerMutation } from "$lib/lecturer-availability-mutations";
   import { lecturerAvailabilityCreateSchema } from "$lib/lecturer-availability-schemas";
-  import { searchUsosStaff } from "$lib/usos-search";
+  import { usosQueries } from "$lib/usos-queries";
 
   const queryClient = useQueryClient();
 
@@ -37,8 +37,7 @@
   });
 
   const staffSearchQuery = createQuery(() => ({
-    queryKey: ["usos-staff-search", debouncedSearch],
-    queryFn: () => searchUsosStaff(debouncedSearch),
+    ...usosQueries.staffSearch(debouncedSearch),
     enabled: debouncedSearch.trim().length >= 2,
   }));
 
