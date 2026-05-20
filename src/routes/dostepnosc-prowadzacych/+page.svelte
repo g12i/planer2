@@ -7,6 +7,10 @@
   const lecturers = $derived(listQuery.data ?? []);
 </script>
 
+<svelte:head>
+	<title>Dostępność prowadzących | Planer</title>
+</svelte:head>
+
 <div class="flex h-full flex-col items-center justify-center gap-4 p-8 text-center">
   <p class="max-w-md text-sm text-foreground-alt">
     {#if lecturers.length === 0}

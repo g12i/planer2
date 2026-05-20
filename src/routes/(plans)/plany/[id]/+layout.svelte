@@ -148,6 +148,10 @@
   } satisfies PlanDetailContextValue);
 </script>
 
+<svelte:head>
+  <title>{planTitle} | Planer</title>
+</svelte:head>
+
 {#if data.user}
   {#if detailQuery.isPending}
     <PlanLoadingSkeleton user={data.user} />

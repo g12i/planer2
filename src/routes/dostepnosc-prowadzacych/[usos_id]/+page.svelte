@@ -175,6 +175,10 @@
   const formLayoutClass = "mx-auto flex w-full max-w-2xl flex-col gap-8";
 </script>
 
+<svelte:head>
+	<title>{name || "Dostępność"} | Planer</title>
+</svelte:head>
+
 {#if detailQuery.isPending}
   <p class="mx-auto max-w-2xl text-sm text-foreground-alt">Ładowanie…</p>
 {:else if detailQuery.isError}

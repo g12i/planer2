@@ -20,7 +20,10 @@
 	});
 </script>
 
-<svelte:head><link rel="icon" href={favicon} /></svelte:head>
+<svelte:head>
+	<title>Planer</title>
+	<link rel="icon" href={favicon} />
+</svelte:head>
 
 <QueryClientProvider client={queryClient}>
 	<TooltipProvider>

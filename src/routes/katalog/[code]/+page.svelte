@@ -4,6 +4,10 @@
   let { data }: PageProps = $props();
 </script>
 
+<svelte:head>
+	<title>{data.programme.name} | Planer</title>
+</svelte:head>
+
 <div class="max-w-4xl space-y-8">
   <div>
     <h2 class="text-2xl font-semibold tracking-tight text-foreground">

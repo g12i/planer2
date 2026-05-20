@@ -1,3 +1,7 @@
+<svelte:head>
+	<title>Plany zajęć | Planer</title>
+</svelte:head>
+
 <div class="max-w-2xl">
 	<h2 class="text-2xl font-semibold tracking-tight text-foreground">
 		Plany zajęć

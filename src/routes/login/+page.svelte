@@ -19,6 +19,10 @@
   );
 </script>
 
+<svelte:head>
+	<title>Logowanie | Planer</title>
+</svelte:head>
+
 <div class="flex min-h-svh flex-col items-center justify-center gap-6 p-6">
   <div
     class="flex w-full max-w-sm -translate-y-[clamp(0.75rem,4svh,2.75rem)] flex-col gap-6"

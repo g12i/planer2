@@ -81,6 +81,10 @@
   }
 </script>
 
+<svelte:head>
+	<title>Nowa dostępność | Planer</title>
+</svelte:head>
+
 <div class="mx-auto flex w-full max-w-2xl flex-col gap-8">
   <h1 class="text-2xl font-semibold tracking-tight text-foreground">
     Nowa dostępność
