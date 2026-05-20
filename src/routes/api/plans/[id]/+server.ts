@@ -183,8 +183,9 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 					.select(
 						"id, plan_semester_subject_group_id, start_date_time, end_date_time, room_usos_id",
 					)
-					.in("plan_semester_subject_group_id", groupIds)
-					.order("start_date_time");
+				.in("plan_semester_subject_group_id", groupIds)
+				.order("start_date_time")
+				.order("id");
 
 				if (entriesError) {
 					throw new Error(
