@@ -63,7 +63,7 @@
       <DatePicker.Trigger
         class="ms-1 inline-flex size-7 shrink-0 items-center justify-center rounded-md text-foreground-alt transition-colors hover:bg-muted active:bg-muted/70"
       >
-        <CalendarBlankIcon class="size-4" weight="regular" aria-hidden="true" />
+        <CalendarBlankIcon />
       </DatePicker.Trigger>
     </div>
     <DatePicker.Content sideOffset={6} class="z-50">
@@ -75,13 +75,13 @@
             <DatePicker.PrevButton
               class="inline-flex size-9 items-center justify-center rounded-md transition-colors hover:bg-muted active:bg-muted/70"
             >
-              <CaretLeftIcon class="size-5" weight="bold" aria-hidden="true" />
+              <CaretLeftIcon />
             </DatePicker.PrevButton>
             <DatePicker.Heading class="text-sm font-medium" />
             <DatePicker.NextButton
               class="inline-flex size-9 items-center justify-center rounded-md transition-colors hover:bg-muted active:bg-muted/70"
             >
-              <CaretRightIcon class="size-5" weight="bold" aria-hidden="true" />
+              <CaretRightIcon />
             </DatePicker.NextButton>
           </DatePicker.Header>
           <div class="pt-4">

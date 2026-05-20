@@ -1,6 +1,8 @@
 <script lang="ts">
 	import BookIcon from 'phosphor-svelte/lib/BookIcon';
+	import CheckIcon from 'phosphor-svelte/lib/CheckIcon';
 	import MoonIcon from 'phosphor-svelte/lib/MoonIcon';
+	import PaletteIcon from 'phosphor-svelte/lib/PaletteIcon';
 	import SignOutIcon from 'phosphor-svelte/lib/SignOutIcon';
 	import SquaresFourIcon from 'phosphor-svelte/lib/SquaresFourIcon';
 	import SunIcon from 'phosphor-svelte/lib/SunIcon';
@@ -8,6 +10,7 @@
 	import UserSwitchIcon from 'phosphor-svelte/lib/UserSwitchIcon';
 
 	import { page } from '$app/state';
+	import { cardColors, toggleCardColors } from '$lib/card-colors.svelte';
 	import DropdownMenuItem from '$lib/components/ui/dropdown-menu-item.svelte';
 	import DropdownMenu from '$lib/components/ui/dropdown-menu.svelte';
 	import Tooltip from '$lib/components/ui/tooltip.svelte';
@@ -67,7 +70,7 @@
 			contentProps={{ side: 'right', align: 'end', sideOffset: 8 }}
 		>
 			{#snippet trigger()}
-				<UserIcon class="size-5" weight="regular" />
+				<UserIcon />
 			{/snippet}
 			{#snippet header()}
 				<span class="block max-w-40 truncate">
@@ -75,23 +78,33 @@
 				</span>
 			{/snippet}
 			{#snippet content()}
-				<DropdownMenuItem onSelect={toggleTheme}>
-					{#snippet icon()}
-						{#if theme.dark}
-							<SunIcon weight="regular" />
-						{:else}
-							<MoonIcon weight="regular" />
-						{/if}
-					{/snippet}
+			<DropdownMenuItem onSelect={toggleTheme}>
+				{#snippet icon()}
 					{#if theme.dark}
-						Jasny motyw
+						<SunIcon />
 					{:else}
-						Ciemny motyw
+						<MoonIcon />
 					{/if}
-				</DropdownMenuItem>
-				<DropdownMenuItem onSelect={onLogout}>
+				{/snippet}
+				{#if theme.dark}
+					Jasny motyw
+				{:else}
+					Ciemny motyw
+				{/if}
+			</DropdownMenuItem>
+			<DropdownMenuItem onSelect={toggleCardColors}>
+				{#snippet icon()}
+					{#if cardColors.enabled}
+						<PaletteIcon />
+					{:else}
+						<PaletteIcon />
+					{/if}
+				{/snippet}
+				{cardColors.enabled ? 'Wyłącz kolory' : 'Koloruj karty'}
+			</DropdownMenuItem>
+			<DropdownMenuItem onSelect={onLogout}>
 					{#snippet icon()}
-						<SignOutIcon weight="regular" />
+						<SignOutIcon />
 					{/snippet}
 					Wyloguj
 				</DropdownMenuItem>

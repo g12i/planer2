@@ -76,7 +76,7 @@
       {/if}
     {/each}
     <DateRangePicker.Trigger class="ms-1 inline-flex size-7 shrink-0 items-center justify-center rounded-md text-foreground-alt transition-colors hover:bg-muted active:bg-muted/70">
-      <CalendarBlankIcon class="size-4" weight="regular" aria-hidden="true" />
+      <CalendarBlankIcon />
     </DateRangePicker.Trigger>
   </div>
   <DateRangePicker.Content sideOffset={6} class="z-50">
@@ -86,13 +86,13 @@
           <DateRangePicker.PrevButton
             class="inline-flex size-9 items-center justify-center rounded-md transition-colors hover:bg-muted active:bg-muted/70"
           >
-            <CaretLeftIcon class="size-5" weight="bold" aria-hidden="true" />
+            <CaretLeftIcon />
           </DateRangePicker.PrevButton>
           <DateRangePicker.Heading class="text-sm font-medium" />
           <DateRangePicker.NextButton
             class="inline-flex size-9 items-center justify-center rounded-md transition-colors hover:bg-muted active:bg-muted/70"
           >
-            <CaretRightIcon class="size-5" weight="bold" aria-hidden="true" />
+            <CaretRightIcon />
           </DateRangePicker.NextButton>
         </DateRangePicker.Header>
         <div class="pt-4">

@@ -72,7 +72,7 @@
       <Dialog.Close
         class="absolute top-3 right-3 inline-flex size-8 items-center justify-center rounded-md text-foreground-alt transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1 focus-visible:outline-hidden"
       >
-        <XIcon class="size-5" weight="regular" aria-hidden="true" />
+        <XIcon />
         <span class="sr-only">Zamknij</span>
       </Dialog.Close>
     </Dialog.Content>

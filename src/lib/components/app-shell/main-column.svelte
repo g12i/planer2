@@ -28,7 +28,7 @@
 					{...props}
 					aria-label={sidebarOpen ? 'Zwiń panel boczny' : 'Rozwiń panel boczny'}
 				>
-					<SidebarIcon class="size-5" weight="regular" />
+					<SidebarIcon />
 				</Button>
 			{/snippet}
 		</Collapsible.Trigger>

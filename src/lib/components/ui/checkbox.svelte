@@ -36,7 +36,7 @@
         {#snippet children({ checked })}
           <span class="inline-flex items-center justify-center text-background">
             {#if checked}
-              <CheckIcon class="size-3.5" weight="bold" aria-hidden="true" />
+              <CheckIcon />
             {/if}
           </span>
         {/snippet}

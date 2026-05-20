@@ -110,7 +110,7 @@
       {:else if trigger}
         {@render trigger()}
       {:else}
-        <CaretUpDownIcon class="size-4" weight="regular" aria-hidden="true" />
+        <CaretUpDownIcon />
       {/if}
     </Combobox.Trigger>
   </div>

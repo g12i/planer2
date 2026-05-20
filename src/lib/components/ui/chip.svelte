@@ -50,7 +50,7 @@
       aria-label={removeLabel}
       onclick={onremove}
     >
-      <XIcon class="size-3" weight="bold" aria-hidden="true" />
+      <XIcon />
     </button>
   {/if}
 </span>
