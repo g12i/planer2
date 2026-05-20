@@ -11,7 +11,7 @@
 		user: { displayName: string };
 		children: Snippet;
 		sidebar: Snippet;
-		title: string;
+		title: Snippet;
 		toolbar?: Snippet;
 	};
 

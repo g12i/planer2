@@ -40,6 +40,10 @@ export const planCreateSchema = z
     },
   );
 
+export const planUpdateSchema = z.object({
+  name: z.string().min(1, "Podaj nazwę planu"),
+});
+
 export const planCreateResponseSchema = z.object({
   id: z.string(),
 });
@@ -73,9 +77,7 @@ export const subjectGroupsUpdateSchema = z
   .min(1, "Dodaj co najmniej jedną grupę")
   .refine(
     (groups) => {
-      const keys = groups.map(
-        (g) => `${g.activity_kind}\0${g.group_index}`,
-      );
+      const keys = groups.map((g) => `${g.activity_kind}\0${g.group_index}`);
       return new Set(keys).size === keys.length;
     },
     {

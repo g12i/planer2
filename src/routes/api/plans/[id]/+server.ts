@@ -2,6 +2,7 @@ import { error, json } from "@sveltejs/kit";
 import {
 	dayLayoutSchema,
 	planDetailSchema,
+	planUpdateSchema,
 	scheduleEntrySchema,
 } from "$lib/plan-schemas";
 import { parseDaySlots } from "$lib/server/planner-schemas";
@@ -245,4 +246,43 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 	};
 
 	return json(planDetailSchema.parse(response));
+};
+
+export const PATCH: RequestHandler = async ({ params, cookies, request }) => {
+	const user = await requireUser(cookies);
+	const planId = params.id;
+
+	const { data: ownership, error: ownershipError } = await getSupabase()
+		.from("plan_ownership")
+		.select("plan_id")
+		.eq("plan_id", planId)
+		.eq("user_id", user.id)
+		.maybeSingle();
+
+	if (ownershipError) {
+		throw new Error(
+			`Failed to verify plan ownership: ${ownershipError.message}`,
+		);
+	}
+
+	if (!ownership) {
+		error(404, "Nie znaleziono planu.");
+	}
+
+	const body = await request.json();
+	const parsed = planUpdateSchema.safeParse(body);
+	if (!parsed.success) {
+		error(400, parsed.error.issues[0]?.message ?? "Nieprawidłowe dane");
+	}
+
+	const { error: updateError } = await getSupabase()
+		.from("plan")
+		.update({ name: parsed.data.name })
+		.eq("id", planId);
+
+	if (updateError) {
+		throw new Error(`Failed to update plan: ${updateError.message}`);
+	}
+
+	return json({ ok: true });
 };

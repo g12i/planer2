@@ -3,7 +3,7 @@
   import { Searcher } from "fast-fuzzy";
   import MagnifyingGlassIcon from "phosphor-svelte/lib/MagnifyingGlassIcon";
   import { setContext } from "svelte";
-  import { createQuery } from "@tanstack/svelte-query";
+  import { createMutation, createQuery, useQueryClient } from "@tanstack/svelte-query";
   import type { PlanDetail, PlanDetailSubject } from "$lib/plan-types";
 
   import PlanSubjectSidebar from "./plan-subject-sidebar.svelte";
@@ -18,6 +18,7 @@
     type PlanDetailContextValue,
   } from "$lib/plan-detail-context";
   import { planQueries } from "$lib/plan-queries";
+  import { updatePlanNameMutationOptions } from "$lib/plan-mutations";
   import type { LayoutProps } from "./$types";
 
   let { data, children }: LayoutProps = $props();
@@ -78,6 +79,34 @@
 
   const planTitle = $derived(plan?.name ?? plan?.programme_code ?? "Plan");
 
+  const queryClient = useQueryClient();
+  const renameMutation = createMutation(() =>
+    updatePlanNameMutationOptions(queryClient, planId),
+  );
+
+  let titleEl = $state<HTMLHeadingElement | null>(null);
+
+  function handleTitleBlur() {
+    if (!titleEl) return;
+    const text = titleEl.textContent?.trim() ?? "";
+    if (text && text !== planTitle) {
+      renameMutation.mutate({ name: text });
+    } else {
+      titleEl.textContent = planTitle;
+    }
+  }
+
+  function handleTitleKeydown(e: KeyboardEvent) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      titleEl?.blur();
+    }
+    if (e.key === "Escape") {
+      if (titleEl) titleEl.textContent = planTitle;
+      titleEl?.blur();
+    }
+  }
+
   setContext(PLAN_DETAIL_KEY, {
     get plan(): PlanDetail {
       return plan as PlanDetail;
@@ -101,7 +130,18 @@
     <p role="alert" class="p-6 text-sm">Nie udało się pobrać planu.</p>
   {:else if plan}
     <Tabs bind:value={activeSemesterId}>
-      <AppShell user={data.user} title={planTitle}>
+      <AppShell user={data.user}>
+        {#snippet title()}
+          <!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
+          <h1
+            bind:this={titleEl}
+            class="cursor-text truncate rounded-sm px-1 text-sm font-semibold text-foreground outline-none ring-ring focus:ring-1"
+            contenteditable="true"
+            role="textbox"
+            onblur={handleTitleBlur}
+            onkeydown={handleTitleKeydown}
+          >{planTitle}</h1>
+        {/snippet}
         {#snippet toolbar()}
           {#if semesters.length > 0}
             <TabsList>

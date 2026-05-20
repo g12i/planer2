@@ -22,6 +22,7 @@ import type {
 	DayLayoutUpsert,
 	PlanCreate,
 	PlanDetail,
+	PlanUpdate,
 	ScheduleEntry,
 	ScheduleEntryCreate,
 	ScheduleEntryDelete,
@@ -45,6 +46,55 @@ export function createPlanMutation(queryClient: QueryClient) {
 			await goto(`/plany/${data.id}`);
 		},
 	}));
+}
+
+export function updatePlanNameMutationOptions(
+	queryClient: QueryClient,
+	planId: string,
+) {
+	return {
+		mutationFn: async (data: PlanUpdate) => {
+			await http({
+				method: "PATCH",
+				url: `/api/plans/${planId}`,
+				payload: data,
+			});
+		},
+		onMutate: async (data: PlanUpdate) => {
+			await queryClient.cancelQueries({
+				queryKey: planDetailQueryKey(planId),
+			});
+
+			const previous = queryClient.getQueryData<PlanDetail>(
+				planDetailQueryKey(planId),
+			);
+
+			if (previous) {
+				queryClient.setQueryData(planDetailQueryKey(planId), {
+					...previous,
+					name: data.name,
+				});
+			}
+
+			return { previous };
+		},
+		onError: (
+			_error: Error,
+			_data: PlanUpdate,
+			context: { previous: PlanDetail | undefined } | undefined,
+		) => {
+			if (context?.previous) {
+				queryClient.setQueryData(
+					planDetailQueryKey(planId),
+					context.previous,
+				);
+			}
+		},
+		onSettled: async () => {
+			await invalidatePlanDetail(queryClient, planId);
+			await invalidatePlanList(queryClient);
+		},
+	};
 }
 
 export function upsertDayLayoutMutationOptions(

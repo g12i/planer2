@@ -41,7 +41,10 @@
 </script>
 
 {#if data.user}
-  <AppShell user={data.user} title="Dostępność prowadzących">
+  <AppShell user={data.user}>
+    {#snippet title()}
+      <h1 class="truncate text-sm font-semibold text-foreground">Dostępność prowadzących</h1>
+    {/snippet}
     {#snippet sidebar()}
       <div class="shrink-0 space-y-3 border-border-card border-b px-4 py-2">
         <Input

@@ -1,23 +1,24 @@
 import type { z } from "zod";
 import type {
-	dayLayoutDeleteSchema,
-	dayLayoutSchema,
-	dayLayoutSlotSchema,
-	dayLayoutUpsertSchema,
-	planCreateResponseSchema,
-	planCreateSchema,
-	planDetailSchema,
-	planDetailSemesterSchema,
-	planDetailSubjectGroupSchema,
-	planDetailSubjectSchema,
-	planListItemSchema,
-	programmeListItemSchema,
-	scheduleEntryCreateSchema,
-	scheduleEntryDeleteSchema,
-	scheduleEntrySchema,
-	scheduleEntryUpdateSchema,
-	subjectGroupUpdateItemSchema,
-	subjectGroupsUpdateSchema,
+  dayLayoutDeleteSchema,
+  dayLayoutSchema,
+  dayLayoutSlotSchema,
+  dayLayoutUpsertSchema,
+  planCreateResponseSchema,
+  planCreateSchema,
+  planDetailSchema,
+  planDetailSemesterSchema,
+  planDetailSubjectGroupSchema,
+  planDetailSubjectSchema,
+  planListItemSchema,
+  planUpdateSchema,
+  programmeListItemSchema,
+  scheduleEntryCreateSchema,
+  scheduleEntryDeleteSchema,
+  scheduleEntrySchema,
+  scheduleEntryUpdateSchema,
+  subjectGroupsUpdateSchema,
+  subjectGroupUpdateItemSchema,
 } from "$lib/plan-schemas";
 
 export type ProgrammeListItem = z.infer<typeof programmeListItemSchema>;
@@ -26,16 +27,18 @@ export type PlanListItem = z.infer<typeof planListItemSchema>;
 
 export type PlanCreate = z.infer<typeof planCreateSchema>;
 
+export type PlanUpdate = z.infer<typeof planUpdateSchema>;
+
 export type PlanCreateResponse = z.infer<typeof planCreateResponseSchema>;
 
 export type PlanDetailSubjectGroup = z.infer<
-	typeof planDetailSubjectGroupSchema
+  typeof planDetailSubjectGroupSchema
 >;
 
 export type PlanDetailSubject = z.infer<typeof planDetailSubjectSchema>;
 
 export type SubjectGroupUpdateItem = z.infer<
-	typeof subjectGroupUpdateItemSchema
+  typeof subjectGroupUpdateItemSchema
 >;
 
 export type SubjectGroupsUpdate = z.infer<typeof subjectGroupsUpdateSchema>;

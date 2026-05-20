@@ -53,7 +53,10 @@
   {#if isPlanDetail}
     {@render children()}
   {:else}
-    <AppShell user={data.user} title="Plany">
+    <AppShell user={data.user}>
+      {#snippet title()}
+        <h1 class="truncate text-sm font-semibold text-foreground">Plany</h1>
+      {/snippet}
       {#snippet sidebar()}
         <div class="shrink-0 space-y-3 border-border-card border-b px-4 py-2">
           <Input

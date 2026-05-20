@@ -8,7 +8,7 @@
 
 	type Props = {
 		sidebarOpen: boolean;
-		title: string;
+		title: Snippet;
 		children: Snippet;
 		toolbar?: Snippet;
 	};
@@ -37,7 +37,7 @@
 				{@render toolbar()}
 			</div>
 		{/if}
-		<h1 class="truncate text-sm font-semibold text-foreground">{title}</h1>
+		{@render title()}
 	</header>
 
 	<ScrollArea variant="muted">
