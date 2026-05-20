@@ -9,16 +9,15 @@
           primary:
             "bg-accent text-accent-foreground hover:brightness-110 active:brightness-95",
           ghost:
-            "text-foreground-alt hover:bg-muted hover:text-foreground active:bg-muted/70",
+            "text-foreground-alt hover:bg-black/4 hover:text-foreground active:bg-black/8 dark:hover:bg-white/4 dark:active:bg-white/8",
           destructive:
             "bg-destructive text-white hover:brightness-110 active:brightness-95 focus-visible:ring-destructive",
         },
         size: {
-          default:
-            'py-2.5 gap-1.5 px-3 text-sm font-medium [&_svg]:size-4!',
-          sm: 'py-1 gap-1 px-2 text-xs font-regular [&_svg]:size-3.5!',
-          icon: 'size-10 shrink-0 gap-0 p-0 [&_svg]:size-4!',
-          "icon-sm": 'size-[26px] shrink-0 gap-0 p-0 [&_svg]:size-3.5!',
+          default: "py-2.5 gap-1.5 px-3 text-sm font-medium [&_svg]:size-4!",
+          sm: "py-1 gap-1 px-2 text-xs font-regular [&_svg]:size-3.5!",
+          icon: "size-10 shrink-0 gap-0 p-0 [&_svg]:size-4!",
+          "icon-sm": "size-[26px] shrink-0 gap-0 p-0 [&_svg]:size-3.5!",
         },
       },
       defaultVariants: {

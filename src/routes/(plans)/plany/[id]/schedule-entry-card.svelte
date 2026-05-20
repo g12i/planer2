@@ -24,6 +24,8 @@
     formatGroupTitle,
     shouldShowGroupLabel,
   } from "./plan-group-label";
+  import { XIcon } from "phosphor-svelte";
+  import Tooltip from "$lib/components/ui/tooltip.svelte";
 
   type Props = {
     subjectName: string;
@@ -78,9 +80,7 @@
     return formatUsosUserDisplayName({ id: group.lecturer_usos_id });
   });
 
-  const activityKindLine = $derived(
-    formatActivityKindLine(group, groups),
-  );
+  const activityKindLine = $derived(formatActivityKindLine(group, groups));
 
   const hoursLine = $derived(`${cumulativeHours}/${group.hours_total}`);
 
@@ -158,28 +158,18 @@
   </div>
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div class="shrink-0" onpointerdown={(event) => event.stopPropagation()}>
-    <DropdownMenu
-      contentProps={{ side: "bottom", align: "end", sideOffset: 4 }}
-    >
+    <Tooltip label="Usuń wpis">
       {#snippet trigger(props)}
         <Button
           variant="ghost"
           size="icon-sm"
-          class="size-6"
+          aria-label="Usuń wpis"
+          onclick={onremove}
           {...props}
-          aria-label="Opcje wpisu"
         >
-          <SlidersHorizontalIcon />
+          <XIcon />
         </Button>
       {/snippet}
-      {#snippet content()}
-        <DropdownMenuItem onSelect={onremove}>
-          {#snippet icon()}
-            <TrashIcon />
-          {/snippet}
-          Usuń
-        </DropdownMenuItem>
-      {/snippet}
-    </DropdownMenu>
+    </Tooltip>
   </div>
 </div>
