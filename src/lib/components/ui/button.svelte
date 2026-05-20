@@ -2,7 +2,7 @@
   import { cva } from "class-variance-authority";
 
   export const buttonVariants = cva(
-    'inline-flex shrink-0 items-center justify-center rounded-md border border-transparent text-sm font-medium whitespace-nowrap transition-all outline-hidden select-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4',
+    "inline-flex shrink-0 items-center justify-center rounded-md whitespace-nowrap transition-all outline-hidden select-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
     {
       variants: {
         variant: {
@@ -14,8 +14,11 @@
             "bg-destructive text-white hover:brightness-110 active:brightness-95 focus-visible:ring-destructive",
         },
         size: {
-          default: "py-2 gap-1.5 px-3",
-          icon: "size-10 shrink-0 gap-0 p-0",
+          default:
+            'py-2.5 gap-1.5 px-3 text-sm font-medium [&_svg]:size-4!',
+          sm: 'py-1 gap-1 px-2 text-xs font-regular [&_svg]:size-3.5!',
+          icon: 'size-10 shrink-0 gap-0 p-0 [&_svg]:size-4!',
+          "icon-sm": 'size-[26px] shrink-0 gap-0 p-0 [&_svg]:size-3.5!',
         },
       },
       defaultVariants: {
