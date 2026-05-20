@@ -389,6 +389,18 @@ export type Database = {
         }
         Relationships: []
       }
+      room_schedule_entries: {
+        Row: {
+          academic_year: number
+          end_date_time: string
+          entry_id: string
+          group_id: string
+          plan_id: string
+          room_usos_id: string
+          start_date_time: string
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never

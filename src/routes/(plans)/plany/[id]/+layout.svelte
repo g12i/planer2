@@ -20,7 +20,14 @@
   } from "$lib/plan-detail-context";
   import { planQueries } from "$lib/plan-queries";
   import { updatePlanNameMutationOptions } from "$lib/plan-mutations";
-  import { invalidateScheduleConflicts } from "$lib/schedule-conflict-queries";
+  import {
+    countConflictsBySeverity,
+    formatConflictCountLabel,
+  } from "$lib/schedule-conflict-counts";
+  import {
+    invalidateScheduleConflicts,
+    scheduleConflictQueries,
+  } from "$lib/schedule-conflict-queries";
   import type { LayoutProps } from "./$types";
 
   let { data, children }: LayoutProps = $props();
@@ -39,6 +46,15 @@
     ...planQueries.detail(planId),
     enabled: Boolean(planId),
   }));
+
+  const conflictsQuery = createQuery(() => ({
+    ...scheduleConflictQueries.forPlan(planId),
+    enabled: Boolean(planId),
+  }));
+
+  const conflictCounts = $derived(
+    countConflictsBySeverity(conflictsQuery.data?.conflicts ?? []),
+  );
 
   const plan = $derived(detailQuery.data);
   const semesters = $derived(plan?.semesters ?? []);
@@ -141,15 +157,33 @@
     <Tabs bind:value={activeSemesterId}>
       <AppShell user={data.user}>
         {#snippet title()}
-          <!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
-          <h1
-            bind:this={titleEl}
-            class="cursor-text truncate rounded-sm px-1 text-sm font-semibold text-foreground outline-none ring-ring focus:ring-1"
-            contenteditable="true"
-            role="textbox"
-            onblur={handleTitleBlur}
-            onkeydown={handleTitleKeydown}
-          >{planTitle}</h1>
+          <div class="flex shrink-0 items-center gap-2">
+            <!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
+            <h1
+              bind:this={titleEl}
+              class="min-w-0 cursor-text truncate rounded-sm px-1 text-sm font-semibold text-foreground outline-none ring-ring focus:ring-1"
+              contenteditable="true"
+              role="textbox"
+              onblur={handleTitleBlur}
+              onkeydown={handleTitleKeydown}
+            >{planTitle}</h1>
+            {#if conflictCounts.errors > 0}
+              <span
+                class="shrink-0 tabular-nums text-xs font-medium text-destructive"
+                title="Błędy"
+              >
+                {formatConflictCountLabel(conflictCounts.errors, "error")}
+              </span>
+            {/if}
+            {#if conflictCounts.warnings > 0}
+              <span
+                class="shrink-0 tabular-nums text-xs font-medium text-amber-600"
+                title="Ostrzeżenia"
+              >
+                {formatConflictCountLabel(conflictCounts.warnings, "warning")}
+              </span>
+            {/if}
+          </div>
         {/snippet}
         {#snippet toolbar()}
           {#if semesters.length > 0}

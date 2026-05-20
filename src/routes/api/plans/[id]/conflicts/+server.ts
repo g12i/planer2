@@ -7,6 +7,7 @@ import {
 	type LecturerScheduleEntryRow,
 	type PlanGroupRow,
 	type PlanScheduleEntryRow,
+	type RoomScheduleEntryRow,
 } from "$lib/server/schedule-conflicts";
 import { getSupabase } from "$lib/server/supabase";
 import type { RequestHandler } from "./$types";
@@ -79,7 +80,7 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 
 	const { data: groups, error: groupsError } = await getSupabase()
 		.from("plan_semester_subject_group")
-		.select("id, lecturer_usos_id")
+		.select("id, lecturer_usos_id, room_usos_id")
 		.in("plan_semester_subject_id", subjectIds);
 
 	if (groupsError) {
@@ -89,6 +90,7 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 	const groupRows: PlanGroupRow[] = groups.map((group) => ({
 		id: group.id,
 		lecturer_usos_id: group.lecturer_usos_id,
+		room_usos_id: group.room_usos_id,
 	}));
 
 	const groupIds = groups.map((group) => group.id);
@@ -126,60 +128,100 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 		),
 	];
 
-	if (lecturerIds.length === 0) {
+	const roomIds = [
+		...new Set(
+			groupRows
+				.map((group) => group.room_usos_id)
+				.filter((id): id is string => Boolean(id)),
+		),
+	];
+
+	if (lecturerIds.length === 0 && roomIds.length === 0) {
 		return json(scheduleConflictsResponseSchema.parse({ conflicts: [] }));
 	}
 
 	const availabilityByUsosId = new Map<string, LecturerAvailabilityRow>();
 
-	const { data: availabilityRows, error: availabilityError } =
-		await getSupabase()
-			.from("lecturer_availability")
-			.select(
-				"usos_id, name, unavailable_days, preferred_days, unavailable_slots, preferred_slots, unavailable_dates",
-			)
-			.in("usos_id", lecturerIds);
+	if (lecturerIds.length > 0) {
+		const { data: availabilityRows, error: availabilityError } =
+			await getSupabase()
+				.from("lecturer_availability")
+				.select(
+					"usos_id, name, unavailable_days, preferred_days, unavailable_slots, preferred_slots, unavailable_dates",
+				)
+				.in("usos_id", lecturerIds);
 
-	if (availabilityError) {
-		throw new Error(
-			`Failed to load lecturer availability: ${availabilityError.message}`,
-		);
-	}
+		if (availabilityError) {
+			throw new Error(
+				`Failed to load lecturer availability: ${availabilityError.message}`,
+			);
+		}
 
-	for (const row of availabilityRows) {
-		availabilityByUsosId.set(row.usos_id, {
-			usos_id: row.usos_id,
-			name: row.name,
-			unavailable_days: row.unavailable_days,
-			preferred_days: row.preferred_days,
-			unavailable_slots: row.unavailable_slots,
-			preferred_slots: row.preferred_slots,
-			unavailable_dates: row.unavailable_dates,
-		});
+		for (const row of availabilityRows) {
+			availabilityByUsosId.set(row.usos_id, {
+				usos_id: row.usos_id,
+				name: row.name,
+				unavailable_days: row.unavailable_days,
+				preferred_days: row.preferred_days,
+				unavailable_slots: row.unavailable_slots,
+				preferred_slots: row.preferred_slots,
+				unavailable_dates: row.unavailable_dates,
+			});
+		}
 	}
 
 	let allYearEntries: LecturerScheduleEntryRow[] = [];
 
-	const { data: yearEntries, error: yearEntriesError } = await getSupabase()
-		.from("lecturer_schedule_entries")
-		.select(
-			"entry_id, start_date_time, end_date_time, lecturer_usos_id, plan_id",
-		)
-		.in("lecturer_usos_id", lecturerIds)
-		.eq("academic_year", plan.academic_year);
+	if (lecturerIds.length > 0) {
+		const { data: yearEntries, error: yearEntriesError } =
+			await getSupabase()
+				.from("lecturer_schedule_entries")
+				.select(
+					"entry_id, start_date_time, end_date_time, lecturer_usos_id, plan_id",
+				)
+				.in("lecturer_usos_id", lecturerIds)
+				.eq("academic_year", plan.academic_year);
 
-	if (yearEntriesError) {
-		console.error(
-			`lecturer_schedule_entries view unavailable, skipping cross-plan conflicts: ${yearEntriesError.message}`,
-		);
-	} else {
-		allYearEntries = yearEntries.map((row) => ({
-			entry_id: row.entry_id,
-			start_date_time: row.start_date_time,
-			end_date_time: row.end_date_time,
-			lecturer_usos_id: row.lecturer_usos_id,
-			plan_id: row.plan_id,
-		}));
+		if (yearEntriesError) {
+			console.error(
+				`lecturer_schedule_entries view unavailable, skipping lecturer cross-plan conflicts: ${yearEntriesError.message}`,
+			);
+		} else {
+			allYearEntries = yearEntries.map((row) => ({
+				entry_id: row.entry_id,
+				start_date_time: row.start_date_time,
+				end_date_time: row.end_date_time,
+				lecturer_usos_id: row.lecturer_usos_id,
+				plan_id: row.plan_id,
+			}));
+		}
+	}
+
+	let allYearRoomEntries: RoomScheduleEntryRow[] = [];
+
+	if (roomIds.length > 0) {
+		const { data: yearRoomEntries, error: yearRoomEntriesError } =
+			await getSupabase()
+				.from("room_schedule_entries")
+				.select(
+					"entry_id, start_date_time, end_date_time, room_usos_id, plan_id",
+				)
+				.in("room_usos_id", roomIds)
+				.eq("academic_year", plan.academic_year);
+
+		if (yearRoomEntriesError) {
+			console.error(
+				`room_schedule_entries view unavailable, skipping room cross-plan conflicts: ${yearRoomEntriesError.message}`,
+			);
+		} else {
+			allYearRoomEntries = yearRoomEntries.map((row) => ({
+				entry_id: row.entry_id,
+				start_date_time: row.start_date_time,
+				end_date_time: row.end_date_time,
+				room_usos_id: row.room_usos_id,
+				plan_id: row.plan_id,
+			}));
+		}
 	}
 
 	const conflicts = computeScheduleConflicts({
@@ -187,6 +229,7 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 		groups: groupRows,
 		availabilityByUsosId,
 		allYearEntries,
+		allYearRoomEntries,
 	});
 
 	return json(scheduleConflictsResponseSchema.parse({ conflicts }));

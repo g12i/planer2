@@ -27,6 +27,7 @@
   } from "./plan-group-label";
   import { XIcon } from "phosphor-svelte";
   import WarningIcon from "phosphor-svelte/lib/WarningIcon";
+  import Popover from "$lib/components/ui/popover.svelte";
   import Tooltip from "$lib/components/ui/tooltip.svelte";
 
   type Props = {
@@ -116,10 +117,6 @@
         : null,
   );
 
-  const conflictTooltip = $derived(
-    conflicts.map((conflict) => conflict.message).join("\n"),
-  );
-
   const conflictBorderClass = $derived.by(() => {
     if (!maxConflictSeverity) {
       return "";
@@ -197,20 +194,34 @@
       class="absolute bottom-0.5 right-0.5 z-10"
       onpointerdown={(event) => event.stopPropagation()}
     >
-      <Tooltip label={conflictTooltip}>
+      <Popover side="top">
         {#snippet trigger(props)}
-          <span
+          <button
+            type="button"
             {...props}
-            class="inline-flex size-5 items-center justify-center {maxConflictSeverity ===
+            class="inline-flex size-5 items-center justify-center border-0 bg-transparent p-0 {maxConflictSeverity ===
             'error'
               ? 'text-destructive'
               : 'text-amber-600'}"
-            aria-label="Konflikt planowania"
+            aria-label="Konflikty planowania"
           >
             <WarningIcon class="size-3.5" weight="fill" />
-          </span>
+          </button>
         {/snippet}
-      </Tooltip>
+        {#snippet content()}
+          <ul class="flex flex-col gap-1">
+            {#each conflicts as conflict (conflict.entry_id + conflict.message)}
+              <li
+                class={conflict.severity === "error"
+                  ? "text-destructive"
+                  : "text-amber-600"}
+              >
+                {conflict.message}
+              </li>
+            {/each}
+          </ul>
+        {/snippet}
+      </Popover>
     </div>
   {/if}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
