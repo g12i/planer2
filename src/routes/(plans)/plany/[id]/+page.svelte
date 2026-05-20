@@ -2,8 +2,13 @@
   import { page } from "$app/state";
   import { getContext } from "svelte";
   import { parseDate } from "@internationalized/date";
-  import { createMutation, useQueryClient } from "@tanstack/svelte-query";
+  import {
+    createMutation,
+    createQuery,
+    useQueryClient,
+  } from "@tanstack/svelte-query";
   import ArrowUUpLeftIcon from "phosphor-svelte/lib/ArrowUUpLeftIcon";
+  import CalendarCheckIcon from "phosphor-svelte/lib/CalendarCheckIcon";
   import ClockIcon from "phosphor-svelte/lib/ClockIcon";
 
   import TabsContent from "$lib/components/ui/tabs-content.svelte";
@@ -20,6 +25,7 @@
     getWeekends,
     type WeekendPair,
   } from "$lib/date-ranges";
+  import { holidayQueries } from "$lib/holiday-queries";
   import {
     PLAN_DETAIL_KEY,
     type PlanDetailContextValue,
@@ -52,6 +58,32 @@
   const semesters = $derived(planDetail.semesters);
   const planId = $derived(page.params.id ?? "");
   const queryClient = useQueryClient();
+
+  const holidayRange = $derived.by(() => {
+    const withDates = semesters.filter(
+      (semester) => semester.start_date && semester.end_date,
+    );
+    if (withDates.length === 0) {
+      return null;
+    }
+
+    const starts = withDates.map((semester) => semester.start_date!);
+    const ends = withDates.map((semester) => semester.end_date!);
+    return {
+      from: starts.sort()[0],
+      to: ends.sort().at(-1)!,
+    };
+  });
+
+  const holidaysQuery = createQuery(() => ({
+    ...holidayQueries.forRange(
+      holidayRange?.from ?? "",
+      holidayRange?.to ?? "",
+    ),
+    enabled: Boolean(holidayRange),
+  }));
+
+  const holidays = $derived(holidaysQuery.data);
 
   const deleteDayLayoutMutation = createMutation(() =>
     deleteDayLayoutMutationOptions(queryClient, planId),
@@ -324,16 +356,31 @@
               {#each days as dayIso (dayIso)}
                 {@const slots = getDaySlots(semester, dayIso)}
                 {@const custom = hasCustomDayLayout(semester, dayIso)}
+                {@const holidayName = holidays?.get(dayIso)}
                 <div
-                  class="grid items-start gap-x-4 gap-y-2 p-4 {dayIso ===
-                  weekend.saturday
-                    ? 'bg-black/3 dark:bg-white/4'
-                    : ''}"
+                  class="grid items-start gap-x-4 gap-y-2 p-4 {holidayName
+                    ? 'bg-red-50 dark:bg-red-900/25'
+                    : dayIso === weekend.saturday
+                      ? 'bg-black/3 dark:bg-white/4'
+                      : ''}"
                   style="grid-template-columns: {gridColumns(slots.length)}"
                 >
                   <div class="flex flex-col items-center gap-1 self-center">
                     <p class="text-sm w-full">{formatIsoDayLabel(dayIso)}</p>
                     <div class="flex items-center gap-1 justify-start w-full">
+                      {#if holidayName}
+                        <Tooltip label={holidayName}>
+                          {#snippet trigger(props)}
+                            <span
+                              {...props}
+                              class="inline-flex size-8 items-center justify-center text-red-500"
+                              aria-label={holidayName}
+                            >
+                              <CalendarCheckIcon class="size-4" weight="fill" />
+                            </span>
+                          {/snippet}
+                        </Tooltip>
+                      {/if}
                       <Tooltip label="Niestandardowe godziny">
                         {#snippet trigger(props)}
                           <Button
@@ -344,10 +391,7 @@
                             aria-label="Niestandardowe godziny"
                             onclick={() => openHoursDialog(semester, dayIso)}
                           >
-                            <ClockIcon
-                              class="size-4"
-                              weight={custom ? "fill" : "regular"}
-                            />
+                            <ClockIcon weight={custom ? "fill" : "regular"} />
                           </Button>
                         {/snippet}
                       </Tooltip>
@@ -363,10 +407,7 @@
                               loading={deleteDayLayoutMutation.isPending}
                               onclick={() => restoreDefaults(semester, dayIso)}
                             >
-                              <ArrowUUpLeftIcon
-                                class="size-4"
-                                weight="regular"
-                              />
+                              <ArrowUUpLeftIcon />
                             </Button>
                           {/snippet}
                         </Tooltip>
