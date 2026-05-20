@@ -60,6 +60,33 @@ export const planDetailSubjectSchema = z.object({
   groups: z.array(planDetailSubjectGroupSchema),
 });
 
+export const subjectGroupUpdateItemSchema = z.object({
+  activity_kind: z.string().min(1),
+  hours_total: z.number().int().nonnegative(),
+  group_index: z.number().int().positive(),
+  label: z.string().nullable(),
+  lecturer_usos_id: z.string().nullable(),
+});
+
+export const subjectGroupsUpdateSchema = z
+  .array(subjectGroupUpdateItemSchema)
+  .min(1, "Dodaj co najmniej jedną grupę")
+  .refine(
+    (groups) => {
+      const keys = groups.map(
+        (g) => `${g.activity_kind}\0${g.group_index}`,
+      );
+      return new Set(keys).size === keys.length;
+    },
+    {
+      message: "Grupy nie mogą się powtarzać (rodzaj + numer)",
+    },
+  );
+
+export const subjectGroupsUpdateResponseSchema = z.array(
+  planDetailSubjectGroupSchema,
+);
+
 export const dayLayoutSlotSchema = z.object({
   start: z.string().regex(/^\d{2}:\d{2}$/),
   end: z.string().regex(/^\d{2}:\d{2}$/),
@@ -85,6 +112,47 @@ export const dayLayoutDeleteSchema = z.object({
   plan_semester_id: z.string(),
 });
 
+const isoDateTimeSchema = z
+  .string()
+  .regex(
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?$/,
+    "Nieprawidłowy format daty i czasu",
+  );
+
+export const scheduleEntrySchema = z.object({
+  id: z.string(),
+  plan_semester_subject_group_id: z.string(),
+  start_date_time: isoDateTimeSchema,
+  end_date_time: isoDateTimeSchema,
+  room_usos_id: z.string().nullable(),
+});
+
+export const scheduleEntryCreateSchema = z
+  .object({
+    plan_semester_subject_group_id: z.string().min(1),
+    start_date_time: isoDateTimeSchema,
+    end_date_time: isoDateTimeSchema,
+  })
+  .refine((data) => data.end_date_time > data.start_date_time, {
+    message: "Koniec musi być po początku",
+    path: ["end_date_time"],
+  });
+
+export const scheduleEntryUpdateSchema = z
+  .object({
+    id: z.string().min(1),
+    start_date_time: isoDateTimeSchema,
+    end_date_time: isoDateTimeSchema,
+  })
+  .refine((data) => data.end_date_time > data.start_date_time, {
+    message: "Koniec musi być po początku",
+    path: ["end_date_time"],
+  });
+
+export const scheduleEntryDeleteSchema = z.object({
+  id: z.string().min(1),
+});
+
 export const planDetailSemesterSchema = z.object({
   id: z.string(),
   number: z.number().int().positive(),
@@ -92,6 +160,7 @@ export const planDetailSemesterSchema = z.object({
   end_date: isoDateSchema.nullable(),
   subjects: z.array(planDetailSubjectSchema),
   day_layouts: z.array(dayLayoutSchema).default([]),
+  schedule_entries: z.array(scheduleEntrySchema).default([]),
 });
 
 export const planDetailSchema = z.object({
