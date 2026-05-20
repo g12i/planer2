@@ -99,8 +99,9 @@
           href="/dostepnosc-prowadzacych/nowy"
           variant="primary"
           class="w-full"
+          size="sm"
         >
-          <PlusIcon class="size-4" weight="bold" />
+          <PlusIcon />
           Dodaj dostępność
         </Button>
       </div>

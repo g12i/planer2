@@ -149,7 +149,7 @@
               {:else}
                 <PlanSubjectSidebar
                   subjects={filteredSubjects}
-                  {isSearching}
+                  planId={planId}
                 />
               {/if}
             </ScrollArea>

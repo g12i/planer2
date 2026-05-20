@@ -105,8 +105,8 @@
         </ScrollArea>
 
         <div class="shrink-0 border-border-card border-t p-3">
-          <Button href="/plany/nowy" variant="primary" class="w-full">
-            <PlusIcon class="size-4" weight="bold" />
+          <Button href="/plany/nowy" variant="primary" class="w-full" size="sm">
+            <PlusIcon weight="bold" />
             Nowy plan
           </Button>
         </div>

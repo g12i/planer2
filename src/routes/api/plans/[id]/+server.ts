@@ -1,7 +1,11 @@
 import { error, json } from "@sveltejs/kit";
-import { dayLayoutSchema, planDetailSchema } from "$lib/plan-schemas";
+import {
+	dayLayoutSchema,
+	planDetailSchema,
+	scheduleEntrySchema,
+} from "$lib/plan-schemas";
 import { parseDaySlots } from "$lib/server/planner-schemas";
-import type { DayLayout, PlanDetail } from "$lib/plan-types";
+import type { DayLayout, PlanDetail, ScheduleEntry } from "$lib/plan-types";
 import { getSessionUser, parseSessionId } from "$lib/server/auth";
 import { getSessionCookieName } from "$lib/server/session";
 import { getSupabase } from "$lib/server/supabase";
@@ -85,6 +89,8 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 	const semesterIds = semesters.map((semester) => semester.id);
 	const subjectsBySemesterId = new Map<string, SubjectRow[]>();
 	const dayLayoutsBySemesterId = new Map<string, DayLayout[]>();
+	const scheduleEntriesBySemesterId = new Map<string, ScheduleEntry[]>();
+	const groupIdToSemesterId = new Map<string, string>();
 
 	if (semesterIds.length > 0) {
 		const { data: dayLayouts, error: dayLayoutsError } = await getSupabase()
@@ -145,6 +151,10 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 				throw new Error(`Failed to load groups: ${groupsError.message}`);
 			}
 
+			const subjectIdToSemesterId = new Map(
+				subjects.map((s) => [s.id, s.plan_semester_id]),
+			);
+
 			for (const group of groups) {
 				const list = groupsBySubjectId.get(group.plan_semester_subject_id) ?? [];
 				list.push({
@@ -156,6 +166,52 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 					lecturer_usos_id: group.lecturer_usos_id,
 				});
 				groupsBySubjectId.set(group.plan_semester_subject_id, list);
+
+				const semesterId = subjectIdToSemesterId.get(
+					group.plan_semester_subject_id,
+				);
+				if (semesterId) {
+					groupIdToSemesterId.set(group.id, semesterId);
+				}
+			}
+
+			const groupIds = groups.map((group) => group.id);
+			if (groupIds.length > 0) {
+				const { data: entries, error: entriesError } = await getSupabase()
+					.from("plan_schedule_entry")
+					.select(
+						"id, plan_semester_subject_group_id, start_date_time, end_date_time, room_usos_id",
+					)
+					.in("plan_semester_subject_group_id", groupIds)
+					.order("start_date_time");
+
+				if (entriesError) {
+					throw new Error(
+						`Failed to load schedule entries: ${entriesError.message}`,
+					);
+				}
+
+				for (const row of entries) {
+					const semesterId = groupIdToSemesterId.get(
+						row.plan_semester_subject_group_id,
+					);
+					if (!semesterId) {
+						continue;
+					}
+
+					const entry = scheduleEntrySchema.parse({
+						id: row.id,
+						plan_semester_subject_group_id:
+							row.plan_semester_subject_group_id,
+						start_date_time: row.start_date_time,
+						end_date_time: row.end_date_time,
+						room_usos_id: row.room_usos_id,
+					});
+
+					const list = scheduleEntriesBySemesterId.get(semesterId) ?? [];
+					list.push(entry);
+					scheduleEntriesBySemesterId.set(semesterId, list);
+				}
 			}
 		}
 
@@ -183,6 +239,8 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 			end_date: semester.end_date,
 			subjects: subjectsBySemesterId.get(semester.id) ?? [],
 			day_layouts: dayLayoutsBySemesterId.get(semester.id) ?? [],
+			schedule_entries:
+				scheduleEntriesBySemesterId.get(semester.id) ?? [],
 		})),
 	};
 
