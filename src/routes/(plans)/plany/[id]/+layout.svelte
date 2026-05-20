@@ -6,6 +6,7 @@
   import { createMutation, createQuery, useQueryClient } from "@tanstack/svelte-query";
   import type { PlanDetail, PlanDetailSubject } from "$lib/plan-types";
 
+  import PlanLoadingSkeleton from "./plan-loading-skeleton.svelte";
   import PlanSubjectSidebar from "./plan-subject-sidebar.svelte";
   import AppShell from "$lib/components/app-shell/app-shell.svelte";
   import Input from "$lib/components/ui/input.svelte";
@@ -133,7 +134,7 @@
 
 {#if data.user}
   {#if detailQuery.isPending}
-    <p class="p-6 text-sm">Ładowanie planu…</p>
+    <PlanLoadingSkeleton user={data.user} />
   {:else if detailQuery.isError}
     <p role="alert" class="p-6 text-sm">Nie udało się pobrać planu.</p>
   {:else if plan}
