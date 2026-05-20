@@ -17,6 +17,11 @@
 
 UI primitives **do not expose** `class`, `inputClass`, `contentClass`, `contentProps`, or similar styling escape hatches — unless there is a proven, in-use need. Callers should not override internal classes; if a primitive's look needs adjusting, change the primitive itself. Exception: a component's **root element** may accept `class?: string` (merged via `cn`) when layout context genuinely varies (e.g. width/margin at the call site).
 
+## Phosphor icons
+
+- **Never** set `weight` — use default.
+- Inside `Button`: **never** set `size` — button variants control icon sizing.
+
 ## Scope
 
 - **Buttons:** typed as native **buttons** only for now (`href` links → extend pattern or use Bits directly).
