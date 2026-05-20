@@ -13,6 +13,12 @@ function errorMessageFromBody(body: unknown, status: number): string {
   return `HTTP error! status: ${status}`;
 }
 
+function isLoginRedirect(response: Response): boolean {
+  if (!response.redirected) return false;
+  const finalUrl = new URL(response.url);
+  return finalUrl.pathname === "/login";
+}
+
 export async function http<TOut extends ZodType, TPayload>({
   method,
   url,
@@ -56,6 +62,11 @@ export async function http<TOut extends ZodType, TPayload>({
   }
 
   const response = await fetch(request);
+
+  if (isLoginRedirect(response)) {
+    window.location.href = "/logout";
+    throw new Error("Session expired");
+  }
 
   if (!response.ok) {
     let body: unknown;

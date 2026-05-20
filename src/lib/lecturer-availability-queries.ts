@@ -1,6 +1,7 @@
 import type { QueryClient } from "@tanstack/svelte-query";
 import { queryOptions } from "@tanstack/svelte-query";
 import { z } from "zod";
+import { http } from "$lib/http";
 import {
 	lecturerAvailabilityFormSchema,
 	lecturerAvailabilityListItemSchema,
@@ -12,29 +13,23 @@ export const lecturerAvailabilityQueries = {
 	list: () =>
 		queryOptions({
 			queryKey: ["lecturer-availability", "list"] as const,
-			queryFn: async () => {
-				const res = await fetch("/api/lecturer-availability");
-				if (!res.ok) {
-					throw new Error("Nie udało się pobrać listy.");
-				}
-				return z
-					.array(lecturerAvailabilityListItemSchema)
-					.parse(await res.json());
-			},
+			queryFn: () =>
+				http({
+					method: "GET",
+					url: "/api/lecturer-availability",
+					schema: z.array(lecturerAvailabilityListItemSchema),
+				}),
 		}),
 
 	detail: (usosId: string) =>
 		queryOptions({
 			queryKey: ["lecturer-availability", "detail", usosId] as const,
-			queryFn: async () => {
-				const res = await fetch(
-					`/api/lecturer-availability/${encodeURIComponent(usosId)}`,
-				);
-				if (!res.ok) {
-					throw new Error("Nie znaleziono dostępności prowadzącego.");
-				}
-				return lecturerAvailabilityFormSchema.parse(await res.json());
-			},
+			queryFn: () =>
+				http({
+					method: "GET",
+					url: `/api/lecturer-availability/${encodeURIComponent(usosId)}`,
+					schema: lecturerAvailabilityFormSchema,
+				}),
 		}),
 };
 

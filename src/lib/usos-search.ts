@@ -1,3 +1,4 @@
+import { http } from "$lib/http";
 import {
 	USOS_SEARCH2_FIELDS,
 	usosSearch2ResponseSchema,
@@ -22,17 +23,11 @@ export async function searchUsosStaff(
 		fields: USOS_SEARCH2_FIELDS,
 	});
 
-	const res = await fetch(`/api/usos/users/search2?${params.toString()}`);
+	const data = await http({
+		method: "GET",
+		url: `/api/usos/users/search2?${params.toString()}`,
+		schema: usosSearch2ResponseSchema,
+	});
 
-	if (!res.ok) {
-		throw new Error(`USOS search failed (${res.status})`);
-	}
-
-	const json: unknown = await res.json();
-	const parsed = usosSearch2ResponseSchema.safeParse(json);
-	if (!parsed.success) {
-		throw new Error("USOS search returned invalid data");
-	}
-
-	return parsed.data.items.map(usosSearchItemToOption);
+	return data.items.map(usosSearchItemToOption);
 }

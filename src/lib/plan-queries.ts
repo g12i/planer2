@@ -1,6 +1,7 @@
 import type { QueryClient } from "@tanstack/svelte-query";
 import { queryOptions } from "@tanstack/svelte-query";
 import { z } from "zod";
+import { http } from "$lib/http";
 import {
 	planDetailSchema,
 	planListItemSchema,
@@ -13,37 +14,34 @@ export const planQueries = {
 	list: () =>
 		queryOptions({
 			queryKey: ["plans", "list"] as const,
-			queryFn: async () => {
-				const res = await fetch("/api/plans");
-				if (!res.ok) {
-					throw new Error("Nie udało się pobrać listy planów.");
-				}
-				return z.array(planListItemSchema).parse(await res.json());
-			},
+			queryFn: () =>
+				http({
+					method: "GET",
+					url: "/api/plans",
+					schema: z.array(planListItemSchema),
+				}),
 		}),
 
 	programmes: () =>
 		queryOptions({
 			queryKey: ["programmes", "list"] as const,
-			queryFn: async () => {
-				const res = await fetch("/api/programmes");
-				if (!res.ok) {
-					throw new Error("Nie udało się pobrać programów studiów.");
-				}
-				return z.array(programmeListItemSchema).parse(await res.json());
-			},
+			queryFn: () =>
+				http({
+					method: "GET",
+					url: "/api/programmes",
+					schema: z.array(programmeListItemSchema),
+				}),
 		}),
 
 	detail: (id: string) =>
 		queryOptions({
 			queryKey: ["plans", "detail", id] as const,
-			queryFn: async () => {
-				const res = await fetch(`/api/plans/${id}`);
-				if (!res.ok) {
-					throw new Error("Nie udało się pobrać planu.");
-				}
-				return planDetailSchema.parse(await res.json());
-			},
+			queryFn: () =>
+				http({
+					method: "GET",
+					url: `/api/plans/${id}`,
+					schema: planDetailSchema,
+				}),
 		}),
 };
 
