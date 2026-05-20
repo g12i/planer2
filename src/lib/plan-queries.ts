@@ -52,3 +52,9 @@ export function invalidatePlanList(queryClient: QueryClient) {
 		queryKey: planQueries.list().queryKey,
 	});
 }
+
+export function invalidatePlanDetail(queryClient: QueryClient, planId: string) {
+	return queryClient.invalidateQueries({
+		queryKey: planQueries.detail(planId).queryKey,
+	});
+}

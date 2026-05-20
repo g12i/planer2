@@ -60,12 +60,38 @@ export const planDetailSubjectSchema = z.object({
   groups: z.array(planDetailSubjectGroupSchema),
 });
 
+export const dayLayoutSlotSchema = z.object({
+  start: z.string().regex(/^\d{2}:\d{2}$/),
+  end: z.string().regex(/^\d{2}:\d{2}$/),
+});
+
+export const dayLayoutSchema = z.object({
+  id: z.string(),
+  date: isoDateSchema,
+  plan_semester_id: z.string(),
+  slots: z.array(dayLayoutSlotSchema),
+});
+
+export const dayLayoutUpsertSchema = z.object({
+  date: isoDateSchema,
+  plan_semester_id: z.string(),
+  slots: z
+    .array(dayLayoutSlotSchema)
+    .min(1, "Dodaj co najmniej jeden przedział"),
+});
+
+export const dayLayoutDeleteSchema = z.object({
+  date: isoDateSchema,
+  plan_semester_id: z.string(),
+});
+
 export const planDetailSemesterSchema = z.object({
   id: z.string(),
   number: z.number().int().positive(),
   start_date: isoDateSchema.nullable(),
   end_date: isoDateSchema.nullable(),
   subjects: z.array(planDetailSubjectSchema),
+  day_layouts: z.array(dayLayoutSchema).default([]),
 });
 
 export const planDetailSchema = z.object({

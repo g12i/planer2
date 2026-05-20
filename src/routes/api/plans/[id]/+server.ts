@@ -1,6 +1,7 @@
 import { error, json } from "@sveltejs/kit";
-import { planDetailSchema } from "$lib/plan-schemas";
-import type { PlanDetail } from "$lib/plan-types";
+import { dayLayoutSchema, planDetailSchema } from "$lib/plan-schemas";
+import { parseDaySlots } from "$lib/server/planner-schemas";
+import type { DayLayout, PlanDetail } from "$lib/plan-types";
 import { getSessionUser, parseSessionId } from "$lib/server/auth";
 import { getSessionCookieName } from "$lib/server/session";
 import { getSupabase } from "$lib/server/supabase";
@@ -83,8 +84,40 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 
 	const semesterIds = semesters.map((semester) => semester.id);
 	const subjectsBySemesterId = new Map<string, SubjectRow[]>();
+	const dayLayoutsBySemesterId = new Map<string, DayLayout[]>();
 
 	if (semesterIds.length > 0) {
+		const { data: dayLayouts, error: dayLayoutsError } = await getSupabase()
+			.from("plan_semester_day_layout")
+			.select("id, plan_semester_id, date, slots")
+			.in("plan_semester_id", semesterIds)
+			.order("date");
+
+		if (dayLayoutsError) {
+			throw new Error(
+				`Failed to load day layouts: ${dayLayoutsError.message}`,
+			);
+		}
+
+		for (const row of dayLayouts) {
+			const parsedSlots = parseDaySlots(row.slots);
+			if (!parsedSlots.success) {
+				throw new Error(
+					`Invalid day layout slots for ${row.id}: ${parsedSlots.error.message}`,
+				);
+			}
+
+			const layout = dayLayoutSchema.parse({
+				id: row.id,
+				date: row.date,
+				plan_semester_id: row.plan_semester_id,
+				slots: parsedSlots.data,
+			});
+
+			const list = dayLayoutsBySemesterId.get(row.plan_semester_id) ?? [];
+			list.push(layout);
+			dayLayoutsBySemesterId.set(row.plan_semester_id, list);
+		}
 		const { data: subjects, error: subjectsError } = await getSupabase()
 			.from("plan_semester_subject")
 			.select("id, plan_semester_id, module_code, module_name")
@@ -149,6 +182,7 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 			start_date: semester.start_date,
 			end_date: semester.end_date,
 			subjects: subjectsBySemesterId.get(semester.id) ?? [],
+			day_layouts: dayLayoutsBySemesterId.get(semester.id) ?? [],
 		})),
 	};
 

@@ -1,5 +1,9 @@
 import type { z } from "zod";
 import type {
+	dayLayoutDeleteSchema,
+	dayLayoutSchema,
+	dayLayoutSlotSchema,
+	dayLayoutUpsertSchema,
 	planCreateResponseSchema,
 	planCreateSchema,
 	planDetailSchema,
@@ -23,6 +27,14 @@ export type PlanDetailSubjectGroup = z.infer<
 >;
 
 export type PlanDetailSubject = z.infer<typeof planDetailSubjectSchema>;
+
+export type DayLayoutSlot = z.infer<typeof dayLayoutSlotSchema>;
+
+export type DayLayout = z.infer<typeof dayLayoutSchema>;
+
+export type DayLayoutUpsert = z.infer<typeof dayLayoutUpsertSchema>;
+
+export type DayLayoutDelete = z.infer<typeof dayLayoutDeleteSchema>;
 
 export type PlanDetailSemester = z.infer<typeof planDetailSemesterSchema>;
 

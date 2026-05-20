@@ -1,9 +1,16 @@
 import type { QueryClient } from "@tanstack/svelte-query";
 import { createMutation } from "@tanstack/svelte-query";
 import { goto } from "$app/navigation";
-import { invalidatePlanList } from "$lib/plan-queries";
-import { planCreateResponseSchema } from "$lib/plan-schemas";
-import type { PlanCreate } from "$lib/plan-types";
+import { invalidatePlanDetail, invalidatePlanList } from "$lib/plan-queries";
+import {
+	dayLayoutSchema,
+	planCreateResponseSchema,
+} from "$lib/plan-schemas";
+import type {
+	DayLayoutDelete,
+	DayLayoutUpsert,
+	PlanCreate,
+} from "$lib/plan-types";
 import { http } from "./http";
 
 export function createPlanMutation(queryClient: QueryClient) {
@@ -21,4 +28,41 @@ export function createPlanMutation(queryClient: QueryClient) {
 			await goto(`/plany/${data.id}`);
 		},
 	}));
+}
+
+export function upsertDayLayoutMutationOptions(
+	queryClient: QueryClient,
+	planId: string,
+) {
+	return {
+		mutationFn: async (data: DayLayoutUpsert) => {
+			return http({
+				method: "PUT",
+				url: `/api/plans/${planId}/day-layouts`,
+				schema: dayLayoutSchema,
+				payload: data,
+			});
+		},
+		onSuccess: async () => {
+			await invalidatePlanDetail(queryClient, planId);
+		},
+	};
+}
+
+export function deleteDayLayoutMutationOptions(
+	queryClient: QueryClient,
+	planId: string,
+) {
+	return {
+		mutationFn: async (data: DayLayoutDelete) => {
+			await http({
+				method: "DELETE",
+				url: `/api/plans/${planId}/day-layouts`,
+				payload: data,
+			});
+		},
+		onSuccess: async () => {
+			await invalidatePlanDetail(queryClient, planId);
+		},
+	};
 }

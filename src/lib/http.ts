@@ -19,7 +19,7 @@ export async function http<TOut extends ZodType, TPayload>({
   schema,
   payload,
 }: {
-  method: "GET" | "POST" | "PATCH" | "DELETE";
+  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   url: string;
   schema: TOut;
   payload?: TPayload;
@@ -30,7 +30,7 @@ export async function http<TPayload>({
   url,
   payload,
 }: {
-  method: "GET" | "POST" | "PATCH" | "DELETE";
+  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   url: string;
   payload?: TPayload;
 }): Promise<Response>;
@@ -41,7 +41,7 @@ export async function http<TOut extends ZodType, TPayload>({
   schema,
   payload,
 }: {
-  method: "GET" | "POST" | "PATCH" | "DELETE";
+  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   url: string;
   schema?: TOut;
   payload?: TPayload;
