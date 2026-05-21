@@ -169,18 +169,29 @@
     <Tabs bind:value={activeSemesterId}>
       <AppShell user={data.user}>
         {#snippet title()}
-          <div class="flex shrink-0 items-center gap-2">
-            <!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
-            <h1
-              bind:this={titleEl}
-              class="min-w-0 cursor-text truncate rounded-sm px-1 text-sm font-semibold text-foreground outline-none ring-ring focus:ring-1"
-              contenteditable="true"
-              role="textbox"
-              onblur={handleTitleBlur}
-              onkeydown={handleTitleKeydown}
-            >
-              {planTitle}
-            </h1>
+          <!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
+          <h1
+            bind:this={titleEl}
+            class="min-w-0 cursor-text truncate rounded-sm px-1 text-sm font-semibold text-foreground outline-none ring-ring focus:ring-1"
+            contenteditable="true"
+            role="textbox"
+            onblur={handleTitleBlur}
+            onkeydown={handleTitleKeydown}
+          >
+            {planTitle}
+          </h1>
+        {/snippet}
+        {#snippet toolbar()}
+          {#if semesters.length > 0}
+            <TabsList>
+              {#each semesters as semester (semester.id)}
+                <TabsTrigger value={semester.id}>
+                  Semestr {semester.number}
+                </TabsTrigger>
+              {/each}
+            </TabsList>
+          {/if}
+          <div class="flex items-center gap-2 ml-auto">
             {#if conflictCounts.errors > 0}
               <span
                 class="shrink-0 tabular-nums text-xs font-medium text-destructive"
@@ -208,17 +219,6 @@
               <ShareIcon />
             </Button>
           </div>
-        {/snippet}
-        {#snippet toolbar()}
-          {#if semesters.length > 0}
-            <TabsList>
-              {#each semesters as semester (semester.id)}
-                <TabsTrigger value={semester.id}>
-                  Semestr {semester.number}
-                </TabsTrigger>
-              {/each}
-            </TabsList>
-          {/if}
         {/snippet}
 
         {#snippet sidebar()}

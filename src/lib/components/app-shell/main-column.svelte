@@ -17,9 +17,7 @@
 </script>
 
 <div class="flex min-h-0 min-w-0 flex-1 flex-col">
-  <header
-    class="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-4 border-border-card border-b bg-background px-4"
-  >
+  <header class="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-4 px-4">
     <Collapsible.Trigger>
       {#snippet child({ props })}
         <Button
@@ -32,17 +30,17 @@
         </Button>
       {/snippet}
     </Collapsible.Trigger>
+    <div class="flex min-w-0 items-center">
+      {@render title()}
+    </div>
     {#if toolbar}
-      <div class="flex min-w-0 flex-1 items-center">
+      <div class="ml-auto flex min-w-0 flex-1 items-center">
         {@render toolbar()}
       </div>
     {/if}
-    <div class="ml-auto flex min-w-0 items-center">
-      {@render title()}
-    </div>
   </header>
 
-  <ScrollArea variant="muted">
+  <ScrollArea>
     <div class="p-6">
       {@render children()}
     </div>
