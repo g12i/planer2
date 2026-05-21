@@ -1,10 +1,7 @@
 <script lang="ts">
   import { createQuery } from "@tanstack/svelte-query";
   import Combobox from "$lib/components/ui/combobox.svelte";
-  import {
-    geoBuildingToOption,
-    geoRoomToOption,
-  } from "$lib/usos-geo-schemas";
+  import { geoBuildingToOption, geoRoomToOption } from "$lib/usos-geo-schemas";
   import { usosQueries } from "$lib/usos-queries";
 
   type Props = {
@@ -49,7 +46,11 @@
   });
 
   $effect(() => {
-    if (buildingId !== prevBuildingId && prevBuildingId && !buildingSyncedFromRoom) {
+    if (
+      buildingId !== prevBuildingId &&
+      prevBuildingId &&
+      !buildingSyncedFromRoom
+    ) {
       roomUsosId = null;
       roomComboboxValue = "";
       roomComboboxInputValue = "";
@@ -140,31 +141,27 @@
   );
 </script>
 
-<div class="flex gap-2">
-  <div class="min-w-0 flex-1">
-    <Combobox
-      items={buildingComboboxItems}
-      bind:value={buildingId}
-      bind:inputValue={buildingInputValue}
-      placeholder="Budynek..."
-      filter={false}
-      {disabled}
-      searching={buildingIndexQuery.isPending}
-      oninput={handleBuildingInput}
-    />
-  </div>
-  <div class="min-w-0 flex-1">
-    <Combobox
-      items={roomComboboxItems}
-      bind:value={roomComboboxValue}
-      bind:inputValue={roomComboboxInputValue}
-      placeholder={buildingId ? "Sala..." : "Najpierw budynek"}
-      filter={true}
-      disabled={disabled || !buildingId}
-      searching={isRoomSearching}
-      oninput={handleRoomInput}
-    />
-  </div>
+<div class="flex flex-col gap-2">
+  <Combobox
+    items={buildingComboboxItems}
+    bind:value={buildingId}
+    bind:inputValue={buildingInputValue}
+    placeholder="Budynek..."
+    filter={false}
+    {disabled}
+    searching={buildingIndexQuery.isPending}
+    oninput={handleBuildingInput}
+  />
+  <Combobox
+    items={roomComboboxItems}
+    bind:value={roomComboboxValue}
+    bind:inputValue={roomComboboxInputValue}
+    placeholder={buildingId ? "Sala..." : "Najpierw budynek"}
+    filter={true}
+    disabled={disabled || !buildingId}
+    searching={isRoomSearching}
+    oninput={handleRoomInput}
+  />
 </div>
 {#if buildingRoomsQuery.isError}
   <p class="text-xs text-destructive">Nie udało się pobrać sal z USOS.</p>
