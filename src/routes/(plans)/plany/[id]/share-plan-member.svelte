@@ -27,7 +27,7 @@
     ...usosQueries.user(member.usos_user_id),
   }));
 
-  const removeMutation = createMutation(() =>
+  const { mutate: removeAccess, isPending: isRemoving } = createMutation(() =>
     removePlanEditorMutationOptions(queryClient, planId),
   );
 
@@ -63,12 +63,12 @@
     <Tooltip label="Cofnij dostęp">
       {#snippet trigger(props)}
         <Button
+          {...props}
           variant="ghost"
           size="icon-sm"
           aria-label="Usuń dostęp"
-          loading={removeMutation.isPending}
-          onclick={() => removeMutation.mutate({ user_id: member.user_id })}
-          {...props}
+          loading={isRemoving}
+          onclick={() => removeAccess({ user_id: member.user_id })}
         >
           <XIcon />
         </Button>

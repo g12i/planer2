@@ -229,11 +229,11 @@
     <Tooltip label="Usuń wpis">
       {#snippet trigger(props)}
         <Button
+          {...props}
           variant="ghost"
           size="icon-sm"
           aria-label="Usuń wpis"
           onclick={onremove}
-          {...props}
         >
           <XIcon />
         </Button>

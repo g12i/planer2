@@ -63,11 +63,11 @@
       {#snippet trigger(props)}
         <MenuItem
           {active}
+          {...props}
           size="icon"
           href={"href" in link ? link.href : undefined}
           aria-label={link.label}
           aria-current={active ? "page" : undefined}
-          {...props}
         >
           <link.icon class="size-5" />
         </MenuItem>
@@ -79,9 +79,9 @@
     <DropdownMenu contentProps={{ side: "right", align: "end", sideOffset: 8 }}>
       {#snippet trigger(props)}
         <Button
+          {...props}
           variant="ghost"
           size="icon"
-          {...props}
           aria-label={`Konto użytkownika: ${user.displayName}`}
         >
           <UserIcon />

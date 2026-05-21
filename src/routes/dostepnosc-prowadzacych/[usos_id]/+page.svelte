@@ -176,7 +176,7 @@
 </script>
 
 <svelte:head>
-	<title>{name || "Dostępność"} | Planer</title>
+  <title>{name || "Dostępność"} | Planer</title>
 </svelte:head>
 
 {#if detailQuery.isPending}
@@ -314,9 +314,9 @@
         >
           {#snippet trigger({ props })}
             <Button
+              {...props}
               variant="destructive"
               loading={deleteMutation.isPending}
-              {...props}
             >
               Usuń dostępność
             </Button>

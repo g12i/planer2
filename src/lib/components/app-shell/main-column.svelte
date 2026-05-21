@@ -21,9 +21,9 @@
     <Collapsible.Trigger>
       {#snippet child({ props })}
         <Button
+          {...props}
           variant="ghost"
           size="icon"
-          {...props}
           aria-label={sidebarOpen ? "Zwiń panel boczny" : "Rozwiń panel boczny"}
         >
           <SidebarIcon />
