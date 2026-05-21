@@ -1,7 +1,6 @@
 import crypto from "node:crypto";
 import OAuth from "oauth-1.0a";
 import { env } from "$env/dynamic/private";
-import { USOS_CONSUMER_KEY, USOS_CONSUMER_SECRET } from "$env/static/private";
 import {
   oauthTokenParamsToAccessTokens,
   oauthTokenParamsToRequestToken,
@@ -36,11 +35,13 @@ function getOrigin(): string {
 }
 
 function createOAuthClient() {
+  const key = env.USOS_CONSUMER_KEY;
+  const secret = env.USOS_CONSUMER_SECRET;
+  if (!key || !secret) {
+    throw new Error("Missing USOS_CONSUMER_KEY or USOS_CONSUMER_SECRET");
+  }
   return new OAuth({
-    consumer: {
-      key: USOS_CONSUMER_KEY,
-      secret: USOS_CONSUMER_SECRET,
-    },
+    consumer: { key, secret },
     signature_method: "HMAC-SHA1",
     hash_function(baseString, key) {
       return crypto.createHmac("sha1", key).update(baseString).digest("base64");

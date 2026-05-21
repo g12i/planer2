@@ -1,14 +1,12 @@
 import { Redis } from "@upstash/redis";
-import {
-  UPSTASH_REDIS_REST_TOKEN,
-  UPSTASH_REDIS_REST_URL,
-} from "$env/static/private";
+import { env } from "$env/dynamic/private";
 import { once } from "$lib/server/once";
 
-export const getRedis = once(
-  () =>
-    new Redis({
-      url: UPSTASH_REDIS_REST_URL,
-      token: UPSTASH_REDIS_REST_TOKEN,
-    }),
-);
+export const getRedis = once(() => {
+  const url = env.UPSTASH_REDIS_REST_URL;
+  const token = env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) {
+    throw new Error("Missing UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN");
+  }
+  return new Redis({ url, token });
+});

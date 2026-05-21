@@ -1,12 +1,15 @@
 import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
-import { TOKEN_ENCRYPTION_KEY } from "$env/static/private";
+import { env } from "$env/dynamic/private";
 
 const ALGORITHM = "aes-256-gcm";
 const IV_LENGTH = 12;
 const TAG_LENGTH = 16;
 
 function getEncryptionKey(): Buffer {
-  const key = Buffer.from(TOKEN_ENCRYPTION_KEY, "base64");
+  if (!env.TOKEN_ENCRYPTION_KEY) {
+    throw new Error("Missing TOKEN_ENCRYPTION_KEY");
+  }
+  const key = Buffer.from(env.TOKEN_ENCRYPTION_KEY, "base64");
   if (key.length !== 32) {
     throw new Error("TOKEN_ENCRYPTION_KEY must be 32 bytes (base64-encoded)");
   }
