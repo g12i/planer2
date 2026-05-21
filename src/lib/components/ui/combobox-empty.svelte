@@ -12,6 +12,6 @@
   {#if children}
     {@render children()}
   {:else}
-    No results found.
+    Nie znaleziono wyników.
   {/if}
 </span>

@@ -5,11 +5,16 @@ const usosTitlesSchema = z.looseObject({
   after: z.string().nullable().optional(),
 });
 
+const usosPhotoUrlsSchema = z.looseObject({
+  "50x50": z.string().optional(),
+});
+
 export const usosSearchUserSchema = z.looseObject({
   id: z.string().min(1),
   first_name: z.string().optional(),
   last_name: z.string().optional(),
   titles: usosTitlesSchema.optional(),
+  photo_urls: usosPhotoUrlsSchema.optional(),
 });
 
 export const usosSearchItemSchema = z.looseObject({
@@ -23,16 +28,18 @@ export const usosSearch2ResponseSchema = z.looseObject({
 });
 
 export const USOS_SEARCH2_FIELDS =
-  "items[match|user[id|first_name|last_name|titles]]";
+  "items[match|user[id|first_name|last_name|titles|photo_urls[50x50]]]";
 
 /** `services/users/user` — single user by `user_id` query param. */
-export const USOS_USER_FIELDS = "id|first_name|last_name|titles";
+export const USOS_USER_FIELDS =
+  "id|first_name|last_name|titles|photo_urls[50x50]";
 
 export const usosUserSchema = z.looseObject({
   id: z.string().min(1),
   first_name: z.string().optional(),
   last_name: z.string().optional(),
   titles: usosTitlesSchema.optional(),
+  photo_urls: usosPhotoUrlsSchema.optional(),
 });
 
 export function formatUsosUserDisplayName(
@@ -65,15 +72,36 @@ export function formatUsosUserSubtitle(
   return title || null;
 }
 
+export function getUsosPhotoUrl50(
+  user: z.infer<typeof usosSearchUserSchema>,
+): string | undefined {
+  const url = user.photo_urls?.["50x50"]?.trim();
+  return url || undefined;
+}
+
+export function getUsosUserInitials(displayName: string): string {
+  const parts = displayName.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) {
+    return "?";
+  }
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+  const last = parts.at(-1) ?? "";
+  return `${parts[0][0]}${last[0] ?? ""}`.toUpperCase();
+}
+
 export function usosSearchItemToOption(
   item: z.infer<typeof usosSearchItemSchema>,
 ) {
   const { user } = item;
+  const label = formatUsosUserDisplayName(user);
 
   return {
     value: user.id,
-    label: formatUsosUserDisplayName(user),
+    label,
     storedName: formatUsosUserStoredName(user),
     subtitle: formatUsosUserSubtitle(user),
+    photoUrl: getUsosPhotoUrl50(user),
   };
 }

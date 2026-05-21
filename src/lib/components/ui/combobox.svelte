@@ -14,6 +14,7 @@
     label: string;
     storedName?: string;
     subtitle?: string | null;
+    photoUrl?: string;
   };
 
   function isStaffOption(item: ComboboxOption): boolean {
@@ -130,6 +131,7 @@
                 value={item.value}
                 label={item.label}
                 subtitle={item.subtitle}
+                photoUrl={item.photoUrl}
               />
             {:else}
               <ComboboxItem value={item.value} label={item.label} />

@@ -2,13 +2,20 @@
   import { page } from "$app/state";
   import { Searcher } from "fast-fuzzy";
   import MagnifyingGlassIcon from "phosphor-svelte/lib/MagnifyingGlassIcon";
+  import ShareIcon from "phosphor-svelte/lib/ShareIcon";
   import { setContext } from "svelte";
-  import { createMutation, createQuery, useQueryClient } from "@tanstack/svelte-query";
+  import {
+    createMutation,
+    createQuery,
+    useQueryClient,
+  } from "@tanstack/svelte-query";
   import type { PlanDetail, PlanDetailSubject } from "$lib/plan-types";
 
   import PlanLoadingSkeleton from "./plan-loading-skeleton.svelte";
   import PlanSubjectSidebar from "./plan-subject-sidebar.svelte";
+  import SharePlanDialog from "./share-plan-dialog.svelte";
   import AppShell from "$lib/components/app-shell/app-shell.svelte";
+  import Button from "$lib/components/ui/button.svelte";
   import Input from "$lib/components/ui/input.svelte";
   import ScrollArea from "$lib/components/ui/scroll-area.svelte";
   import Tabs from "$lib/components/ui/tabs.svelte";
@@ -110,6 +117,7 @@
   );
 
   let titleEl = $state<HTMLHeadingElement | null>(null);
+  let shareOpen = $state(false);
 
   function handleTitleBlur() {
     if (!titleEl) return;
@@ -170,7 +178,9 @@
               role="textbox"
               onblur={handleTitleBlur}
               onkeydown={handleTitleKeydown}
-            >{planTitle}</h1>
+            >
+              {planTitle}
+            </h1>
             {#if conflictCounts.errors > 0}
               <span
                 class="shrink-0 tabular-nums text-xs font-medium text-destructive"
@@ -187,6 +197,16 @@
                 {formatConflictCountLabel(conflictCounts.warnings, "warning")}
               </span>
             {/if}
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Udostępnij plan"
+              onclick={() => {
+                shareOpen = true;
+              }}
+            >
+              <ShareIcon />
+            </Button>
           </div>
         {/snippet}
         {#snippet toolbar()}
@@ -232,12 +252,11 @@
                   Brak przedmiotów
                 </p>
               {:else if filteredSubjects.length === 0}
-                <p class="px-4 py-2 text-xs text-foreground-alt">Brak wyników</p>
+                <p class="px-4 py-2 text-xs text-foreground-alt">
+                  Brak wyników
+                </p>
               {:else}
-                <PlanSubjectSidebar
-                  subjects={filteredSubjects}
-                  planId={planId}
-                />
+                <PlanSubjectSidebar subjects={filteredSubjects} {planId} />
               {/if}
             </ScrollArea>
           </div>
@@ -245,6 +264,7 @@
 
         {@render children()}
       </AppShell>
+      <SharePlanDialog {planId} bind:open={shareOpen} />
     </Tabs>
   {/if}
 {/if}

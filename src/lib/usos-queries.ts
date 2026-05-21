@@ -15,11 +15,12 @@ import {
 	usosSearchItemToOption,
 	usosUserSchema,
 } from "$lib/usos-users-schemas";
+import type { UsosSearchAmong } from "$lib/usos-users-types";
 
 export const usosQueries = {
-	staffSearch: (query: string) =>
+	staffSearch: (query: string, among: UsosSearchAmong = "current_teachers") =>
 		queryOptions({
-			queryKey: ["usos", "staff-search", query] as const,
+			queryKey: ["usos", "staff-search", among, query] as const,
 			queryFn: async () => {
 				const trimmed = query.trim();
 				if (trimmed.length < 2) {
@@ -30,7 +31,7 @@ export const usosQueries = {
 					lang: "pl",
 					format: "json",
 					query: trimmed,
-					among: "current_teachers",
+					among,
 					num: "20",
 					fields: USOS_SEARCH2_FIELDS,
 				});
@@ -47,7 +48,7 @@ export const usosQueries = {
 
 	user: (userId: string) =>
 		queryOptions({
-			queryKey: ["usos", "user", userId, "titles"] as const,
+			queryKey: ["usos", "user", userId, "profile"] as const,
 			staleTime: 1000 * 60 * 60,
 			gcTime: 1000 * 60 * 60 * 24,
 			queryFn: () => {

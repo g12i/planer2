@@ -214,7 +214,7 @@
                           {...props}
                           type="button"
                           variant="ghost"
-                          size="icon"
+                          size="icon-sm"
                           class="shrink-0"
                           aria-label="Usuń grupę"
                           disabled={countForKind(kind) <= 1 || isPending}

@@ -489,8 +489,7 @@
                                 entry.id,
                                 semester.schedule_entries,
                               )}
-                              conflicts={conflictsByEntryId.get(entry.id) ??
-                                []}
+                              conflicts={conflictsByEntryId.get(entry.id) ?? []}
                               dragging={draggingEntryId === entry.id}
                               ondragstart={(event) =>
                                 onEntryDragStart(event, entry)}

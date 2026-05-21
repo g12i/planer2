@@ -29,7 +29,7 @@
 
   let { variant, children, type = "hover", ...rest }: Props = $props();
 
-  const rootClass = scrollAreaRootVariants({ variant });
+  const rootClass = $derived(scrollAreaRootVariants({ variant }));
 </script>
 
 <ScrollArea.Root {type} class={rootClass} {...rest}>
